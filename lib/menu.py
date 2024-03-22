@@ -16,22 +16,16 @@ Menu types:
 """
 import machine
 from ssd1306 import SSD1306_I2C
+
 i2c = machine.I2C(0, sda=machine.Pin(16), scl=machine.Pin(17))
 display = SSD1306_I2C(128, 64, i2c)
-
-
-class Menu:
-    def __init__(self, name: str, items: list) -> None:
-        self.name = name
-        self.items = items
-        # ! initialize display
 
 
 class SingleSelectVerticalScrollMenu():
     """
     A menu type that lets the user select a single item from a list of strings
-
     """
+
     global display
 
     def __init__(self, name: str, selection: str, items=None, total_lines=4) -> None:
@@ -48,7 +42,7 @@ class SingleSelectVerticalScrollMenu():
     def set_selected(self, selection: str) -> None:
         # use when button is pressed
         self.selected = selection
-        
+
     def set_selected_index(self, selection: int) -> None:
         self.selected = self.items[selection]
 
@@ -69,6 +63,7 @@ class SingleSelectVerticalScrollMenu():
 
         # shift all item positions down to prevent clipping issues
         display.fill(0)
+        # TODO display short version of selected item after name
         display.text(self.name, 2, 4, 1)
         display.rect(0, 0, 128, 15, 1)
         for i in range(min(len(self.items) - self.menu_start_index, self.total_lines)):
@@ -89,3 +84,35 @@ class SingleSelectVerticalScrollMenu():
             self.menu_start_index += 1
         if index < self.menu_start_index:
             self.menu_start_index -= 1
+
+
+class NumericalValueMenu():
+    global display
+    """A menu type that lets a user change a numerical value within a specified range, increment can also be changed"""
+
+    def __init__(self, name, selected_value, new_value, range: range) -> None:
+        self.name = name
+        self.selected_value = selected_value
+        self.new_value = new_value
+        self.range = range
+
+    def set_selected(self, selection) -> None:
+        self.selected_value = selection
+
+    def get_selected(self):
+        return self.selected_value
+
+    def scroll(self, new_value) -> None:
+        self.new_value = new_value
+        # TODO implement self.range
+        # figure out how to connect the encoder with increments
+
+    def display_menu(self) -> None:
+        display.fill(0)
+        display.text(self.name, 2, 4, 1)
+        display.rect(0, 0, 128, 15, 1)
+        if self.new_value == self.selected_value:
+            text = '*'+str(self.new_value)
+        else:
+            text = str(self.new_value)
+        display.text(text, 36, 64, 1)
