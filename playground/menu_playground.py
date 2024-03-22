@@ -42,7 +42,8 @@ def button_action(pin, event) -> None:
     # set rotary value back to 0 when button is pressed
     if event == Button.PRESSED:
         current_menu.set_menu_start_index(0)
-        current_menu.set_selected_index(0)
+        current_menu.set_highlighted_index(0)
+        current_menu.set_selected_index(val_new)
         r.set(value=0)
 
 
@@ -58,7 +59,7 @@ def update_encoder_range() -> None:
 
 
 # Initial display
-menu.display_menu()
+current_menu.display_menu()
 update_encoder_range()
 
 # loop
@@ -73,6 +74,6 @@ while True:
         # scroll
         current_menu.scroll(val_new)
         # set selected index
-        current_menu.set_selected_index(val_new) 
+        current_menu.set_highlighted_index(val_new) 
         # display menu
         current_menu.display_menu()

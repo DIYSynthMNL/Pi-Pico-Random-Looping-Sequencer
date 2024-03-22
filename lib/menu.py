@@ -24,6 +24,7 @@ class Menu:
     def __init__(self, name: str, items: list) -> None:
         self.name = name
         self.items = items
+        # ! initialize display
 
 
 class SingleSelectVerticalScrollMenu():
@@ -32,8 +33,6 @@ class SingleSelectVerticalScrollMenu():
 
     """
     global display
-
-    # ! implement oled
 
     def __init__(self, name: str, selection: str, items=None, total_lines=4) -> None:
         self.name = name
@@ -44,44 +43,47 @@ class SingleSelectVerticalScrollMenu():
             self.items = items
         self.menu_start_index = 0
         self.total_lines = total_lines
-        self.selected_index = 0
+        self.highlighted_index = 0
 
     def set_selected(self, selection: str) -> None:
         # use when button is pressed
         self.selected = selection
+        
+    def set_selected_index(self, selection: int) -> None:
+        self.selected = self.items[selection]
 
     def get_selected(self) -> str:
         return self.selected
-    
-    def set_menu_start_index(self, menu_start_index):
+
+    def set_menu_start_index(self, menu_start_index) -> None:
         self.menu_start_index = menu_start_index
-        
-    def set_selected_index(self, selected_index):
-        self.selected_index = selected_index
+
+    def set_highlighted_index(self, highlighted_index) -> None:
+        self.highlighted_index = highlighted_index
 
     def display_menu(self) -> None:
         item_index = 0
         pixel_y_shift = 20
         line_height = 10
         spacer = 2
-        
+
         # shift all item positions down to prevent clipping issues
         display.fill(0)
         display.text(self.name, 2, 4, 1)
         display.rect(0, 0, 128, 15, 1)
         for i in range(min(len(self.items) - self.menu_start_index, self.total_lines)):
             item_index = self.menu_start_index + i
-            if item_index == self.selected_index:
+            if item_index == self.highlighted_index:
                 # highlighted item
                 display.fill_rect(0, ((i * (line_height+spacer))-1) +
                                   pixel_y_shift, 128, line_height, 1)
-                display.text(self.items[item_index], 0,
+                display.text('*' + self.items[item_index] if self.selected == self.items[item_index] else self.items[item_index], 0,
                              (i * (line_height+spacer))+pixel_y_shift, 0)
             else:
-                display.text(self.items[item_index], 0,
+                display.text('*' + self.items[item_index] if self.selected == self.items[item_index] else self.items[item_index], 0,
                              (i * (line_height+spacer))+pixel_y_shift, 1)
         display.show()
-        
+
     def scroll(self, index):
         if index > self.menu_start_index + (self.total_lines-1):
             self.menu_start_index += 1
