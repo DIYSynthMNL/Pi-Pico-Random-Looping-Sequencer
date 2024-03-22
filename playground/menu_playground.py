@@ -22,7 +22,6 @@ import menu as m
 
 from rotary_irq_rp2 import RotaryIRQ
 from mp_button import Button
-from menu import Menu
 
 r = RotaryIRQ(pin_num_clk=18,
               pin_num_dt=19,
@@ -74,6 +73,6 @@ while True:
         # scroll
         current_menu.scroll(val_new)
         # set selected index
-        current_menu.set_highlighted_index(val_new) 
+        current_menu.set_highlighted_index(val_new)
         # display menu
         current_menu.display_menu()
