@@ -72,7 +72,7 @@ while True:
 
         # scroll
         current_menu.scroll(val_new)
-        # set selected index
+        # set highlighted index
         current_menu.set_highlighted_index(val_new)
         # display menu
         current_menu.display_menu()
