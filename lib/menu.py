@@ -15,18 +15,32 @@ Menu types:
 
 """
 
-# TODO implement rotary encoder
 import machine
 from ssd1306 import SSD1306_I2C
+from rotary_irq_rp2 import RotaryIRQ
+from mp_button import Button
 
 i2c = machine.I2C(0, sda=machine.Pin(16), scl=machine.Pin(17))
 display = SSD1306_I2C(128, 64, i2c)
+r = RotaryIRQ(pin_num_clk=18,
+              pin_num_dt=19,
+              reverse=False,
+              pull_up=True,
+              range_mode=RotaryIRQ.RANGE_BOUNDED)
+
+# TODO implement button action callback
+def button_action(pin, event) -> None:
+    global selected_index, menu_start_index
+    if event == Button.PRESSED:
+        pass
+
+b = Button(20, internal_pullup=True, callback=button_action)
 
 
 class SingleSelectVerticalScrollMenu():
     """
     A menu type that lets a user select one of the choices from a list of strings
-    
+
         ATTRIBUTES:
         name: str
             The name that will be displayed on the top
@@ -84,13 +98,23 @@ class SingleSelectVerticalScrollMenu():
         """
         menu_start_index determines the first item that will be shown in the display.
         It is used for scrolling.
-        
+
         For example: a value of 0 will display the first item in the list as the first item in the display
         """
         self.menu_start_index = menu_start_index
 
     def set_highlighted_index(self, highlighted_index) -> None:
         self.highlighted_index = highlighted_index
+
+    # TODO initial display function
+    def start(self) -> None:
+        global val_old, val_new
+        val_new = 0
+        val_old = -1
+        self.menu_start_index = 0
+        self.highlighted_index = 0
+        r.set(value=0, min_val=0, max_val=len(self.items)-1, incr=1)
+        self.display_menu()
 
     def display_menu(self) -> None:
         item_index = 0
@@ -124,6 +148,18 @@ class SingleSelectVerticalScrollMenu():
         if index < self.menu_start_index:
             self.menu_start_index -= 1
 
+    # TODO update func
+    def update(self) -> None:
+        global val_old, val_new
+        val_new = r.value()
+        b.update()
+
+        if val_old != val_new:
+            val_old = val_new
+            self.scroll(val_new)
+            self.set_highlighted_index(val_new)
+            self.display_menu()
+
 
 class NumericalValueRangeMenu():
     global display
@@ -133,8 +169,8 @@ class NumericalValueRangeMenu():
         self.name = name
         self.selected_value = selected_value
         self.new_value = new_value
-        self.start = min_val
-        self.stop = max_val
+        self.min_val = min_val
+        self.max_val = max_val
         self.increment = increment
 
     def set_selected(self, selection) -> None:
@@ -142,6 +178,15 @@ class NumericalValueRangeMenu():
 
     def scroll(self, new_value: int) -> None:
         self.new_value = new_value
+
+    # TODO initial display func
+    def start(self) -> None:
+        global val_old, val_new
+        val_new = 0
+        val_old = -1
+        r.set(value=self.selected_value, min_val=self.min_val,
+              max_val=self.max_val, incr=self.increment)
+        self.display_menu()
 
     def display_menu(self) -> None:
         display.fill(0)
@@ -157,6 +202,16 @@ class NumericalValueRangeMenu():
         display.text(text, 0, 31, 0)
         display.show()
 
+    # TODO update function
+    def update(self) -> None:
+        global val_new, val_old
+        val_new = r.value()
+        b.update()
+        if val_old != val_new:
+            val_old = val_new
+            self.scroll(val_new)
+            self.display_menu()
+        
 
 def remove_vowels(word: str) -> str:
     # TODO do not remove leading vowels
