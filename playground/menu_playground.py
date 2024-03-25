@@ -31,8 +31,6 @@ cv_prob_menu = m.NumericalValueRangeMenu(
 steps_menu = m.NumericalValueRangeMenu(
     "Steps", selected_value=1, increment=1, min_val=1, max_val=16)
 
-main_menu = m.MainMenu(submenus=[scale_menu, cv_prob_menu, steps_menu])
-
 current_menu = scale_menu
 
 # # Initial display
