@@ -31,35 +31,43 @@ r = RotaryIRQ(pin_num_clk=18,
 
 scale_intervals = mcp4725_musical_scales.get_intervals()
 
-menu = m.SingleSelectVerticalScrollMenu(
+singe_select_menu = m.SingleSelectVerticalScrollMenu(
     name='Scale', selection='chromatic', items=scale_intervals)
-current_menu = menu
+
+numerical_range_menu = m.NumericalValueRangeMenu(
+    "CV Probability", selected_value=50, increment=5)
+
+current_menu = numerical_range_menu
 
 
 def button_action(pin, event) -> None:
     global selected_index, menu_start_index
-    # set rotary value back to 0 when button is pressed
     if event == Button.PRESSED:
-        current_menu.set_menu_start_index(0)
-        current_menu.set_highlighted_index(0)
-        current_menu.set_selected_index(val_new)
-        r.set(value=0)
+        if current_menu is singe_select_menu:
+            singe_select_menu.set_menu_start_index(0)
+            singe_select_menu.set_highlighted_index(0)
+            singe_select_menu.set_selected_index(val_new)
+            r.set(value=0)
+        elif current_menu is numerical_range_menu:
+            numerical_range_menu.set_selected(val_new)
+            r.set(value=numerical_range_menu.selected_value)
+            numerical_range_menu.display_menu()
 
 
 b = Button(20, internal_pullup=True, callback=button_action)
 
-r.set(value=0)
-val_old = -1
-
-
-def update_encoder_range() -> None:
-    # Update min_val and max_val based on the number of menu items
-    r.set(min_val=0, max_val=len(current_menu.items) - 1)
-
-
 # Initial display
-current_menu.display_menu()
-update_encoder_range()
+if current_menu is singe_select_menu:
+    r.set(value=0)
+    val_old = -1
+    r.set(min_val=0, max_val=len(singe_select_menu.items) - 1)
+    singe_select_menu.display_menu()
+elif current_menu is numerical_range_menu:
+    val_old = -1
+    r.set(value=numerical_range_menu.selected_value)
+    r.set(min_val=numerical_range_menu.start,
+          max_val=numerical_range_menu.stop, incr=numerical_range_menu.increment)
+    numerical_range_menu.display_menu()
 
 # loop
 while True:
@@ -70,9 +78,10 @@ while True:
     if val_old != val_new:
         val_old = val_new
 
-        # scroll
-        current_menu.scroll(val_new)
-        # set highlighted index
-        current_menu.set_highlighted_index(val_new)
-        # display menu
-        current_menu.display_menu()
+        if current_menu is singe_select_menu:
+            singe_select_menu.scroll(val_new)
+            singe_select_menu.set_highlighted_index(val_new)
+            singe_select_menu.display_menu()
+        elif current_menu is numerical_range_menu:
+            numerical_range_menu.scroll(val_new)
+            numerical_range_menu.display_menu()
