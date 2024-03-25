@@ -48,7 +48,8 @@ current_menu = scale_menu
 #     elif current_menu is numerical_range_menu:
 #         numerical_range_menu.update()
 
-main_menu.start()
+m.set_submenus(submenu_list=[scale_menu, cv_prob_menu, steps_menu])
+m.start()
 
 while True:
-    main_menu.update()
+    m.update()

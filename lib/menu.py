@@ -28,28 +28,103 @@ r = RotaryIRQ(pin_num_clk=18,
               pull_up=True,
               range_mode=RotaryIRQ.RANGE_BOUNDED)
 
+# Main menu variables
+submenus: list = []
+total_lines: int = 0
+menu_start_index = 0
+highlighted_index = 0
+val_old = -1
+val_new = 0
+
+
+def set_submenus(submenu_list: list) -> None:
+    global submenus, total_lines
+    submenus = submenu_list
+    total_lines = len(submenu_list)
+
+
+def display_menu() -> None:
+    global menu_start_index, highlighted_index, total_lines
+
+    item_index = 0
+    pixel_y_shift = 20
+    line_height = 10
+    spacer = 2
+
+    # draw title bar
+    display.fill(0)
+    display.text('Main Menu', 2, 4, 1)
+    display.rect(0, 0, display.width, 15, 1)
+
+    # draw submenu lines
+    for i in range(min(total_lines - menu_start_index, total_lines)):
+        item_index = menu_start_index + i
+        submenu_text_line = submenus[item_index].__repr__()
+        if item_index == highlighted_index:
+            # draw highlighted item
+            display.fill_rect(0, ((i * (line_height+spacer))-1) +
+                              pixel_y_shift, display.width, line_height, 1)
+            display.text(f'{submenu_text_line}', 0,
+                         (i*(line_height+spacer))+pixel_y_shift, 0)
+        else:
+            display.text(f'{submenu_text_line}', 0,
+                         (i*(line_height+spacer))+pixel_y_shift, 1)
+    display.show()
+
+
+def scroll(index) -> None:
+    global menu_start_index
+    if index > menu_start_index + (total_lines-1):
+        menu_start_index += 1
+    if index < menu_start_index:
+        menu_start_index -= 1
+
+
+def start() -> None:
+    global val_old, val_new, r, menu_start_index, highlighted_index, total_lines
+    val_new = 0
+    val_old = -1
+    menu_start_index = 0
+    highlighted_index = 0
+    r.set(value=0, min_val=0, max_val=total_lines-1, incr=1)
+    display_menu()
+
+
+def update() -> None:
+    global val_old, val_new, r, b, highlighted_index
+    val_new = r.value()
+    b.update()
+
+    if val_old != val_new:
+        val_old = val_new
+        scroll(val_new)
+        highlighted_index = val_new
+        display_menu()
+
+
 # -1 is the main menu, succeeding ones are 0++
 current_menu_index = -1
+
 
 def button_action(pin, event) -> None:
     global current_menu_index
     if event == Button.PRESSED:
-        """
-        ! have a global variable called current menu, 
-        ! the main menu will let the user choose what the current menu is
-
-        if single select vertical scroll menu
-        set selected index to val new
-
-        if numerical value range
-        set selected to val new
-        """
         if current_menu_index == -1:
             # main menu
+            # latch on submenu selected
             pass
         else:
             # submenus
+            """
+            if single select vertical scroll menu
+            set selected index to val new
+
+            if numerical value range
+            set selected to val new
+            """
             pass
+
+# TODO latch on submenu display based on flags
 
 
 b = Button(20, internal_pullup=True, callback=button_action)
@@ -130,7 +205,7 @@ class MainMenu():
             self.menu_start_index += 1
         if index < self.menu_start_index:
             self.menu_start_index -= 1
-            
+
     def start(self) -> None:
         global val_old, val_new
         val_new = 0
@@ -139,12 +214,12 @@ class MainMenu():
         self.highlighted_index = 0
         r.set(value=0, min_val=0, max_val=self.total_lines-1, incr=1)
         self.display_menu()
-            
+
     def update(self) -> None:
         global val_old, val_new
         val_new = r.value()
         b.update()
-        
+
         if val_old != val_new:
             val_old = val_new
             self.scroll(val_new)
