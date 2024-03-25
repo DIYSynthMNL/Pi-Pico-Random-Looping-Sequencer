@@ -25,11 +25,19 @@ display = SSD1306_I2C(128, 64, i2c)
 
 class SingleSelectVerticalScrollMenu():
     """
-    A menu type that lets the user select a single item from a list of strings
-
-    Note: Selected and highlighted is different from each other
-    Highlighted means...
-    Selected means...
+    A menu type that lets a user select one of the choices from a list of strings
+    
+        ATTRIBUTES:
+        name: str
+            The name that will be displayed on the top
+        selected: str
+            The current chosen value
+        items: list[str]
+            List of items to choose from
+        total_lines: int (default = 4)
+            Total number of selectable item lines to display. 4 would suffice for an oled display with a height of 64px
+        highlighted_index: int (default = 0)
+            Will determine which line is highlighted or filled. Not intended to be set outside an instance.
 
     Usage example:
         Initializing:
@@ -54,9 +62,9 @@ class SingleSelectVerticalScrollMenu():
 
     global display
 
-    def __init__(self, name: str, *, selection: str, items=None, total_lines=4) -> None:
+    def __init__(self, name: str, *, selected: str, items=None, total_lines: int = 4) -> None:
         self.name = name
-        self.selected = selection
+        self.selected = selected
         if items == None:
             items = []
         else:
@@ -65,14 +73,20 @@ class SingleSelectVerticalScrollMenu():
         self.total_lines = total_lines
         self.highlighted_index = 0
 
-    def set_selected(self, selection: str) -> None:
-        # use when button is pressed
-        self.selected = selection
+    def set_selected(self, selected: str) -> None:
+        self.selected = selected
 
-    def set_selected_index(self, selection: int) -> None:
-        self.selected = self.items[selection]
+    def set_selected_index(self, selected: int) -> None:
+        """Sets selected attribute to the referenced index's string value from the items list"""
+        self.selected = self.items[selected]
 
     def set_menu_start_index(self, menu_start_index) -> None:
+        """
+        menu_start_index determines the first item that will be shown in the display.
+        It is used for scrolling.
+        
+        For example: a value of 0 will display the first item in the list as the first item in the display
+        """
         self.menu_start_index = menu_start_index
 
     def set_highlighted_index(self, highlighted_index) -> None:
@@ -86,7 +100,8 @@ class SingleSelectVerticalScrollMenu():
 
         # shift all item positions down to prevent clipping issues
         display.fill(0)
-        display.text(f'{self.name}:{self.selected if len(self.selected) <= 9 else remove_vowels(self.selected)}', 2, 4, 1)
+        display.text(f'{self.name}:{self.selected if len(
+            self.selected) <= 9 else remove_vowels(self.selected)}', 2, 4, 1)
         display.rect(0, 0, 128, 15, 1)
         for i in range(min(len(self.items) - self.menu_start_index, self.total_lines)):
             item_index = self.menu_start_index + i
@@ -108,19 +123,18 @@ class SingleSelectVerticalScrollMenu():
             self.menu_start_index += 1
         if index < self.menu_start_index:
             self.menu_start_index -= 1
-        
 
 
 class NumericalValueRangeMenu():
     global display
     """A menu type that lets a user change a numerical value within a specified range, increment can also be changed"""
 
-    def __init__(self, name: str, *, selected_value: int, new_value: int = 0, start: int = 0, stop: int = 100, increment: int = 1) -> None:
+    def __init__(self, name: str, *, selected_value: int, new_value: int = 0, min_val: int = 0, max_val: int = 100, increment: int = 1) -> None:
         self.name = name
         self.selected_value = selected_value
         self.new_value = new_value
-        self.start = start
-        self.stop = stop
+        self.start = min_val
+        self.stop = max_val
         self.increment = increment
 
     def set_selected(self, selection) -> None:
@@ -143,6 +157,8 @@ class NumericalValueRangeMenu():
         display.text(text, 0, 31, 0)
         display.show()
 
+
 def remove_vowels(word: str) -> str:
+    # TODO do not remove leading vowels
     vowels = ['a', 'e', 'i', 'o', 'u', 'A', 'E', 'I', 'O', 'U']
     return ''.join([char for char in word if char not in vowels])
