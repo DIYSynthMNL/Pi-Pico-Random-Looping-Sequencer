@@ -32,7 +32,7 @@ r = RotaryIRQ(pin_num_clk=18,
 scale_intervals = mcp4725_musical_scales.get_intervals()
 
 singe_select_menu = m.SingleSelectVerticalScrollMenu(
-    name='Scale', selection='chromatic', items=scale_intervals)
+    'Scale', selected='chromatic', items=scale_intervals)
 
 numerical_range_menu = m.NumericalValueRangeMenu(
     "CV Probability", selected_value=50, increment=5)
