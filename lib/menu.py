@@ -28,13 +28,128 @@ r = RotaryIRQ(pin_num_clk=18,
               pull_up=True,
               range_mode=RotaryIRQ.RANGE_BOUNDED)
 
-# TODO implement button action callback
+# -1 is the main menu, succeeding ones are 0++
+current_menu_index = -1
+
 def button_action(pin, event) -> None:
-    global selected_index, menu_start_index
+    global current_menu_index
     if event == Button.PRESSED:
-        pass
+        """
+        ! have a global variable called current menu, 
+        ! the main menu will let the user choose what the current menu is
+
+        if single select vertical scroll menu
+        set selected index to val new
+
+        if numerical value range
+        set selected to val new
+        """
+        if current_menu_index == -1:
+            # main menu
+            pass
+        else:
+            # submenus
+            pass
+
 
 b = Button(20, internal_pullup=True, callback=button_action)
+
+
+class MainMenu():
+    # TODO this does not need to be a class
+    """
+    Lets the user change values on submenu items using the 
+    rotary encoder to scroll and select a submenu to edit
+
+    The main menu will tie it all together.
+    Can have submenus of SingleSelectVerticalScrollMenu or NumericalValueRangeMenu
+
+    This class will be similar to the behavior of the SingleSelectVerticalScrollMenu class.
+
+    Attributes:
+        submenus: list
+            A list of menu types within the main menu
+        highlighted_submenu_index: int
+        menu_start_index: int
+        total_lines: int
+            The number of lines to display. On a 64px height oled display use 4
+
+    Methods:
+        display_menu() -> None:
+            Will display all submenus:
+                [Submenu name]: [Submenu selected value]
+        scroll() -> None:
+            will change the highlighted submenu and scroll
+        start() -> None:
+            will start or initialize the menu's variable
+        update() -> None:
+            Is where the rotary encoder is listened to to call scroll() and display_menu().
+            The button is also listened to.
+            When the button is pressed:
+                global current_menu = highlighted submenu
+                The highlighted submenu's start() and update() method will be called
+            After the submenu selection:
+                Go back to displaying the main menu
+
+    """
+
+    def __init__(self, *, submenus: list) -> None:
+        self.submenus = submenus
+        self.total_lines: int = len(submenus)
+        self.menu_start_index = 0
+        self.highlighted_index = 0
+
+    def display_menu(self) -> None:
+        item_index = 0
+        pixel_y_shift = 20
+        line_height = 10
+        spacer = 2
+
+        # draw title bar
+        display.fill(0)
+        display.text('Main Menu', 2, 4, 1)
+        display.rect(0, 0, display.width, 15, 1)
+
+        # draw submenu lines
+        for i in range(min(self.total_lines - self.menu_start_index, self.total_lines)):
+            item_index = self.menu_start_index + i
+            submenu_text_line = self.submenus[item_index].__repr__()
+            if item_index == self.highlighted_index:
+                # draw highlighted item
+                display.fill_rect(0, ((i * (line_height+spacer))-1) +
+                                  pixel_y_shift, display.width, line_height, 1)
+                display.text(f'{submenu_text_line}', 0,
+                             (i*(line_height+spacer))+pixel_y_shift, 0)
+            else:
+                display.text(f'{submenu_text_line}', 0,
+                             (i*(line_height+spacer))+pixel_y_shift, 1)
+        display.show()
+
+    def scroll(self, index) -> None:
+        if index > self.menu_start_index + (self.total_lines-1):
+            self.menu_start_index += 1
+        if index < self.menu_start_index:
+            self.menu_start_index -= 1
+            
+    def start(self) -> None:
+        global val_old, val_new
+        val_new = 0
+        val_old = -1
+        self.menu_start_index = 0
+        self.highlighted_index = 0
+        r.set(value=0, min_val=0, max_val=self.total_lines-1, incr=1)
+        self.display_menu()
+            
+    def update(self) -> None:
+        global val_old, val_new
+        val_new = r.value()
+        b.update()
+        
+        if val_old != val_new:
+            val_old = val_new
+            self.scroll(val_new)
+            self.highlighted_index = val_new
+            self.display_menu()
 
 
 class SingleSelectVerticalScrollMenu():
@@ -52,6 +167,8 @@ class SingleSelectVerticalScrollMenu():
             Total number of selectable item lines to display. 4 would suffice for an oled display with a height of 64px
         highlighted_index: int (default = 0)
             Will determine which line is highlighted or filled. Not intended to be set outside an instance.
+
+        Methods:
 
     Usage example:
         Initializing:
@@ -106,7 +223,6 @@ class SingleSelectVerticalScrollMenu():
     def set_highlighted_index(self, highlighted_index) -> None:
         self.highlighted_index = highlighted_index
 
-    # TODO initial display function
     def start(self) -> None:
         global val_old, val_new
         val_new = 0
@@ -148,7 +264,6 @@ class SingleSelectVerticalScrollMenu():
         if index < self.menu_start_index:
             self.menu_start_index -= 1
 
-    # TODO update func
     def update(self) -> None:
         global val_old, val_new
         val_new = r.value()
@@ -159,6 +274,11 @@ class SingleSelectVerticalScrollMenu():
             self.scroll(val_new)
             self.set_highlighted_index(val_new)
             self.display_menu()
+
+    def __repr__(self) -> str:
+        selected_shortened = self.selected if len(
+            self.selected) < 9 else remove_vowels(self.selected)
+        return f'{self.name}:{selected_shortened}'
 
 
 class NumericalValueRangeMenu():
@@ -179,7 +299,6 @@ class NumericalValueRangeMenu():
     def scroll(self, new_value: int) -> None:
         self.new_value = new_value
 
-    # TODO initial display func
     def start(self) -> None:
         global val_old, val_new
         val_new = 0
@@ -202,7 +321,6 @@ class NumericalValueRangeMenu():
         display.text(text, 0, 31, 0)
         display.show()
 
-    # TODO update function
     def update(self) -> None:
         global val_new, val_old
         val_new = r.value()
@@ -211,7 +329,10 @@ class NumericalValueRangeMenu():
             val_old = val_new
             self.scroll(val_new)
             self.display_menu()
-        
+
+    def __repr__(self) -> str:
+        return f'{self.name}:{self.selected_value}'
+
 
 def remove_vowels(word: str) -> str:
     # TODO do not remove leading vowels

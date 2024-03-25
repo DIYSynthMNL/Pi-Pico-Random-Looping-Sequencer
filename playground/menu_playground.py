@@ -22,23 +22,33 @@ import menu as m
 
 scale_intervals = mcp4725_musical_scales.get_intervals()
 
-singe_select_menu = m.SingleSelectVerticalScrollMenu(
+scale_menu = m.SingleSelectVerticalScrollMenu(
     'Scale', selected='chromatic', items=scale_intervals)
 
-numerical_range_menu = m.NumericalValueRangeMenu(
-    "CV Probability", selected_value=50, increment=5)
+cv_prob_menu = m.NumericalValueRangeMenu(
+    "CVProb", selected_value=50, increment=5)
 
-current_menu = singe_select_menu
+steps_menu = m.NumericalValueRangeMenu(
+    "Steps", selected_value=1, increment=1, min_val=1, max_val=16)
 
-# Initial display
-if current_menu is singe_select_menu:
-    singe_select_menu.start()
-elif current_menu is numerical_range_menu:
-    numerical_range_menu.start()
+main_menu = m.MainMenu(submenus=[scale_menu, cv_prob_menu, steps_menu])
 
-# loop
+current_menu = scale_menu
+
+# # Initial display
+# if current_menu is singe_select_menu:
+#     singe_select_menu.start()
+# elif current_menu is numerical_range_menu:
+#     numerical_range_menu.start()
+
+# # loop
+# while True:
+#     if current_menu is singe_select_menu:
+#         singe_select_menu.update()
+#     elif current_menu is numerical_range_menu:
+#         numerical_range_menu.update()
+
+main_menu.start()
+
 while True:
-    if current_menu is singe_select_menu:
-        singe_select_menu.update()
-    elif current_menu is numerical_range_menu:
-        numerical_range_menu.update()
+    main_menu.update()
