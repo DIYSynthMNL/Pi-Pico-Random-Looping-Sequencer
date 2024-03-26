@@ -1,18 +1,29 @@
 """
-Made to aid in making a menu system for the Pi Pico with an Oled Screen
+Made to aid in making a menu system for the Pi Pico with an Oled Screen and a rotary encoder
 
-Menu types:
-- Main menu
-    - can have a list of children (sub menus)
-    - display current value of children
-- Single select vertical scroll
-    - traverse through a list
-- Numerical list
-    - has a list of numbers
-- Numerical range
-    - create a list from first, and last number
-- Numerical percent (0-100)
+Currently tested and working for 128px * 64px OLED displays
 
+Main menu
+    - has a list of submenus
+    - displays current values of children (submenus)
+    - can change/edit selected value of a child (submenu)
+
+Submenus (implemented)
+    - Single select vertical scroll
+        - a list of strings
+    - Numerical value range menu
+        - a list from min to max value
+
+Submenus (to implement)
+    - Button
+        - actions: press, hold
+    - Screens
+        - like a summary of what is going on
+        
+TODO code clean up
+TODO documentation
+TODO screen size constants
+TODO screensaver
 """
 
 import machine
@@ -136,12 +147,7 @@ def button_action(pin, event) -> None:
 b = Button(20, internal_pullup=True, callback=button_action)
 
 
-# latch on submenu display based on flags
-# start submenu: change submenu_started flag to true
-# update submenu: call current_submenu update()
-
 def exit_main_menu_loop() -> bool:
-    # a function that will be called in the main loop to check submenu flags in order to exit the main menu update loop
     return True if submenu_editing is True else False
 
 
