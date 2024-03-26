@@ -30,11 +30,18 @@ r = RotaryIRQ(pin_num_clk=18,
 
 # Main menu variables
 submenus: list = []
+submenu_started = False
+submenu_editing = False
+current_submenu = None
+main_menu_started = False
 total_lines: int = 0
 menu_start_index = 0
 highlighted_index = 0
 val_old = -1
 val_new = 0
+
+# -1 is the main menu, succeeding ones are 0++
+current_menu_index = -1
 
 
 def set_submenus(submenu_list: list) -> None:
@@ -44,7 +51,6 @@ def set_submenus(submenu_list: list) -> None:
 
 
 def display_menu() -> None:
-    global menu_start_index, highlighted_index, total_lines
 
     item_index = 0
     pixel_y_shift = 20
@@ -81,17 +87,18 @@ def scroll(index) -> None:
 
 
 def start() -> None:
-    global val_old, val_new, r, menu_start_index, highlighted_index, total_lines
+    global val_new, val_old, menu_start_index, highlighted_index, main_menu_started
     val_new = 0
     val_old = -1
     menu_start_index = 0
     highlighted_index = 0
     r.set(value=0, min_val=0, max_val=total_lines-1, incr=1)
+    main_menu_started = True
     display_menu()
 
 
 def update() -> None:
-    global val_old, val_new, r, b, highlighted_index
+    global val_old, highlighted_index
     val_new = r.value()
     b.update()
 
@@ -102,37 +109,61 @@ def update() -> None:
         display_menu()
 
 
-# -1 is the main menu, succeeding ones are 0++
-current_menu_index = -1
-
-
 def button_action(pin, event) -> None:
-    global current_menu_index
+    global current_submenu, submenu_started, submenu_editing, current_menu_index
     if event == Button.PRESSED:
         if current_menu_index == -1:
-            # main menu
+            # button pressed in main menu
             # latch on submenu selected
-            pass
+            print(f'Submenus size:{len(submenus)}')
+            current_submenu = submenus[highlighted_index]
+            print(f'Highlighted index: {highlighted_index}')
+            print(f'Current submenu:{current_submenu.__repr__()}')
+            submenu_started = False
+            submenu_editing = True
         else:
-            # submenus
-            """
-            if single select vertical scroll menu
-            set selected index to val new
-
-            if numerical value range
-            set selected to val new
-            """
-            pass
-
-# TODO latch on submenu display based on flags
+            # button pressed in submenus
+            print('Submenu button pressed')
+            submenu_started = False
+            submenu_editing = False
+            # change selected on current_submenu
+            if current_submenu != None:
+                current_submenu.set_selected(val_new)
+            # go back to main menu
+            current_menu_index = -1
+            
+            
 
 
 b = Button(20, internal_pullup=True, callback=button_action)
 
 
+# latch on submenu display based on flags
+# start submenu: change submenu_started flag to true
+# update submenu: call current_submenu update()
+
+def exit_main_menu_loop() -> bool:
+    # a function that will be called in the main loop to check submenu flags in order to exit the main menu update loop
+    return True if submenu_editing is True else False
+
+
+def edit_submenu() -> None:
+    global submenu_started, current_menu_index, main_menu_started
+    main_menu_started = False
+    if submenu_started is False and submenu_editing is True:
+        current_menu_index = val_new
+        if current_submenu is not None:
+            current_submenu.start()
+        submenu_started = True
+
+    if submenu_started is True and submenu_editing is True:
+        if current_submenu is not None:
+            current_submenu.update()
+
+
 class SingleSelectVerticalScrollMenu():
     """
-    A menu type that lets a user select one of the choices from a list of strings
+    A submenu type that lets a user select one of the choices from a list of strings
 
         ATTRIBUTES:
         name: str
@@ -182,10 +213,7 @@ class SingleSelectVerticalScrollMenu():
         self.total_lines = total_lines
         self.highlighted_index = 0
 
-    def set_selected(self, selected: str) -> None:
-        self.selected = selected
-
-    def set_selected_index(self, selected: int) -> None:
+    def set_selected(self, selected: int) -> None:
         """Sets selected attribute to the referenced index's string value from the items list"""
         self.selected = self.items[selected]
 
@@ -261,7 +289,7 @@ class SingleSelectVerticalScrollMenu():
 
 class NumericalValueRangeMenu():
     global display
-    """A menu type that lets a user change a numerical value within a specified range, increment can also be changed"""
+    """A submenu type that lets a user change a numerical value within a specified range, increment can also be changed"""
 
     def __init__(self, name: str, *, selected_value: int, new_value: int = 0, min_val: int = 0, max_val: int = 100, increment: int = 1) -> None:
         self.name = name

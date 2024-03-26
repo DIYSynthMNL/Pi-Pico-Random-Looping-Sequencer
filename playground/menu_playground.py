@@ -33,21 +33,14 @@ steps_menu = m.NumericalValueRangeMenu(
 
 current_menu = scale_menu
 
-# # Initial display
-# if current_menu is singe_select_menu:
-#     singe_select_menu.start()
-# elif current_menu is numerical_range_menu:
-#     numerical_range_menu.start()
-
-# # loop
-# while True:
-#     if current_menu is singe_select_menu:
-#         singe_select_menu.update()
-#     elif current_menu is numerical_range_menu:
-#         numerical_range_menu.update()
-
 m.set_submenus(submenu_list=[scale_menu, cv_prob_menu, steps_menu])
 m.start()
 
 while True:
-    m.update()
+    if not m.exit_main_menu_loop():
+        if m.main_menu_started == False:
+            m.start()
+        else:
+            m.update()
+    else:
+        m.edit_submenu()
