@@ -131,8 +131,6 @@ def button_action(pin, event) -> None:
                 current_submenu.set_selected(val_new)
             # go back to main menu
             current_menu_index = -1
-            
-            
 
 
 b = Button(20, internal_pullup=True, callback=button_action)
@@ -159,9 +157,20 @@ def edit_submenu() -> None:
     if submenu_started is True and submenu_editing is True:
         if current_submenu is not None:
             current_submenu.update()
-            
+
+
 def get_submenu_list() -> list:
     return submenus
+
+
+def loop_main_menu() -> None:
+    if not exit_main_menu_loop():
+        if main_menu_started == False:
+            start()
+        else:
+            update()
+    else:
+        edit_submenu()
 
 
 class SingleSelectVerticalScrollMenu():

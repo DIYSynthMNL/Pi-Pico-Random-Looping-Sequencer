@@ -36,25 +36,9 @@ submenus = [scale_menu, cv_prob_menu, steps_menu]
 current_menu = scale_menu
 
 m.set_submenus(submenu_list=submenus)
-m.start()
 
 while True:
     # TODO if submenus are changed, update submenus
     submenus = m.get_submenu_list()
-    for submenu in submenus:
-        name = submenu.name
-        if name is 'Scale':
-            scale_menu.selected = submenu.selected
-        if name is 'CVProb':
-            cv_prob_menu.selected_value = submenu.selected_value
-        if name is 'Steps':
-            steps_menu.selected_value = submenu.selected_value
         
-        
-    if not m.exit_main_menu_loop():
-        if m.main_menu_started == False:
-            m.start()
-        else:
-            m.update()
-    else:
-        m.edit_submenu()
+    m.loop_main_menu()
