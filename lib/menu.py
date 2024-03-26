@@ -159,6 +159,9 @@ def edit_submenu() -> None:
     if submenu_started is True and submenu_editing is True:
         if current_submenu is not None:
             current_submenu.update()
+            
+def get_submenu_list() -> list:
+    return submenus
 
 
 class SingleSelectVerticalScrollMenu():
