@@ -62,7 +62,6 @@ def set_submenus(submenu_list: list) -> None:
 
 
 def display_menu() -> None:
-
     item_index = 0
     pixel_y_shift = 20
     line_height = 10
@@ -154,12 +153,13 @@ def exit_main_menu_loop() -> bool:
 def edit_submenu() -> None:
     global submenu_started, current_menu_index, main_menu_started
     main_menu_started = False
+    # start submenu
     if submenu_started is False and submenu_editing is True:
         current_menu_index = val_new
         if current_submenu is not None:
             current_submenu.start()
         submenu_started = True
-
+    # do submenu update loop
     if submenu_started is True and submenu_editing is True:
         if current_submenu is not None:
             current_submenu.update()
@@ -169,7 +169,7 @@ def get_submenu_list() -> list:
     return submenus
 
 
-def loop_main_menu() -> None:
+def loop_main_menu(update_main_program_values_callback=None) -> None:
     if not exit_main_menu_loop():
         if main_menu_started == False:
             start()
@@ -177,56 +177,26 @@ def loop_main_menu() -> None:
             update()
     else:
         edit_submenu()
+        if submenu_editing is False and update_main_program_values_callback is not None:
+            update_main_program_values_callback()
+            
+class Submenu():
+    """A base class of submenus"""
+    def __init__(self, name: str, selected) -> None:
+        self.name = name
+        self.selected = selected
 
 
-class SingleSelectVerticalScrollMenu():
+class SingleSelectVerticalScrollMenu(Submenu):
     """
     A submenu type that lets a user select one of the choices from a list of strings
-
-        ATTRIBUTES:
-        name: str
-            The name that will be displayed on the top
-        selected: str
-            The current chosen value
-        items: list[str]
-            List of items to choose from
-        total_lines: int (default = 4)
-            Total number of selectable item lines to display. 4 would suffice for an oled display with a height of 64px
-        highlighted_index: int (default = 0)
-            Will determine which line is highlighted or filled. Not intended to be set outside an instance.
-
-        Methods:
-
-    Usage example:
-        Initializing:
-        menu = m.SingleSelectVerticalScrollMenu(
-            name='Scale', selection='chromatic', items=scale_intervals)
-
-        On button press:
-        if event == Button.PRESSED:
-            current_menu.set_menu_start_index(0)
-            current_menu.set_highlighted_index(0)
-            current_menu.set_selected_index(val_new)
-            r.set(value=0)
-
-        When encoder is rotated:
-        only update display if the value has changed
-        if val_old != val_new:
-            val_old = val_new
-            current_menu.scroll(val_new)
-            current_menu.set_highlighted_index(val_new)
-            current_menu.display_menu()
     """
 
     global display
 
-    def __init__(self, name: str, *, selected: str, items=None, total_lines: int = 4) -> None:
-        self.name = name
-        self.selected = selected
-        if items == None:
-            items = []
-        else:
-            self.items = items
+    def __init__(self, name: str, *, selected: str, items: list[str], total_lines: int = 4) -> None:
+        super().__init__(name, selected)
+        self.items = items
         self.menu_start_index = 0
         self.total_lines = total_lines
         self.highlighted_index = 0
@@ -305,20 +275,19 @@ class SingleSelectVerticalScrollMenu():
         return f'{self.name}:{selected_shortened}'
 
 
-class NumericalValueRangeMenu():
+class NumericalValueRangeMenu(Submenu):
     global display
     """A submenu type that lets a user change a numerical value within a specified range, increment can also be changed"""
 
-    def __init__(self, name: str, *, selected_value: int, new_value: int = 0, min_val: int = 0, max_val: int = 100, increment: int = 1) -> None:
-        self.name = name
-        self.selected_value = selected_value
+    def __init__(self, name: str, *, selected: int, new_value: int = 0, min_val: int = 0, max_val: int = 100, increment: int = 1) -> None:
+        super().__init__(name, selected)
         self.new_value = new_value
         self.min_val = min_val
         self.max_val = max_val
         self.increment = increment
 
     def set_selected(self, selection) -> None:
-        self.selected_value = selection
+        self.selected = selection
 
     def scroll(self, new_value: int) -> None:
         self.new_value = new_value
@@ -327,7 +296,7 @@ class NumericalValueRangeMenu():
         global val_old, val_new
         val_new = 0
         val_old = -1
-        r.set(value=self.selected_value, min_val=self.min_val,
+        r.set(value=self.selected, min_val=self.min_val,
               max_val=self.max_val, incr=self.increment)
         self.display_menu()
 
@@ -336,8 +305,8 @@ class NumericalValueRangeMenu():
         display.text(self.name, 2, 4, 1)
         display.rect(0, 0, 128, 15, 1)
         # old value
-        display.text(f'Old: {self.selected_value}', 0, 20, 1)
-        if self.new_value == self.selected_value:
+        display.text(f'Old: {self.selected}', 0, 20, 1)
+        if self.new_value == self.selected:
             text = f'New: *{self.new_value}'
         else:
             text = f'New: {self.new_value}'
@@ -355,7 +324,7 @@ class NumericalValueRangeMenu():
             self.display_menu()
 
     def __repr__(self) -> str:
-        return f'{self.name}:{self.selected_value}'
+        return f'{self.name}:{self.selected}'
 
 
 def remove_vowels(word: str) -> str:

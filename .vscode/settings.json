@@ -24,5 +24,6 @@
         "octatonic",
         "Pico",
         "rtype"
-    ]
+    ],
+    "editor.formatOnSave": true
 }

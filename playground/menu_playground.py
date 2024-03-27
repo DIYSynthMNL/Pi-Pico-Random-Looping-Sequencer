@@ -23,13 +23,14 @@ import menu as m
 scale_intervals = mcp4725_musical_scales.get_intervals()
 
 scale_menu = m.SingleSelectVerticalScrollMenu(
-    'Scale', selected='chromatic', items=scale_intervals)
+    "Scale", selected="chromatic", items=scale_intervals
+)
 
-cv_prob_menu = m.NumericalValueRangeMenu(
-    "CVProb", selected_value=50, increment=5)
+cv_prob_menu = m.NumericalValueRangeMenu("CVProb", selected=50, increment=5)
 
 steps_menu = m.NumericalValueRangeMenu(
-    "Steps", selected_value=1, increment=1, min_val=1, max_val=16)
+    "Steps", selected=1, increment=1, min_val=1, max_val=16
+)
 
 submenus = [scale_menu, cv_prob_menu, steps_menu]
 
@@ -40,5 +41,5 @@ m.set_submenus(submenu_list=submenus)
 while True:
     # TODO if submenus are changed, update submenus
     submenus = m.get_submenu_list()
-        
+
     m.loop_main_menu()
