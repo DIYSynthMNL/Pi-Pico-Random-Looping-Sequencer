@@ -17,7 +17,7 @@ ROT Pin 3 to GP18
 SW Pin 1 to GND
 SW Pin 2 to GP20
 
-Main menu (Code currently assumes that you only have 1 main menu)
+Main menu (Design currently assumes that you only have 1 main menu)
     - has a list of submenus
     - displays current values of children (submenus)
     - can change/edit selected value of a child (submenu)
@@ -33,6 +33,24 @@ Submenus (to implement)
         - actions: press, hold
     - Screens
         - like a summary of what is going on
+
+# todo put below in a readme
+How the menu system works:
+SETTING SUBMENUS:
+First, you would have to create instances of submenus in your main program.
+Then you can put those instances in a list called submenu_list.
+Lastly, call the set_submenus().
+
+MAKING THE DISPLAY AND ENCODER DO ITS JOB:
+Call loop_main_menu(update_main_program_values_callback=[callback_function]) in a while True loop.
+The callback function is for updating the variables used in your main program. It is discussed more in detail below.
+
+GETTING DATA FROM THE MENU SYSTEM INTO YOUR MAIN PROGRAM:
+This library only handles the "front end" of your main python program, handling user interaction with the display and the rotary encoder.
+It is designed to hold data but you should have variables in your main program so you can access the data easily.
+For example, you need to get data from a submenu: you would need to call get_submenu_list() in order to update the main program's variables.
+To help you update your main program's variables from the submenus, you will need to provide a callback function in your main program (example: update_values()).
+This callback function will only be called when a submenu's selected value has been changed (user pressed the encoder button).
         
 TODO code clean up
 TODO documentation

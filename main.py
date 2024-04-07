@@ -1,5 +1,5 @@
 """
-Pi Pico Random Looping Sequencer (with 128x64 px OLED screen)
+Pi Pico Quantized Random Looping Sequencer (with 128x64 px OLED screen)
 By DIYSynthMNL
 
 Wiring:
