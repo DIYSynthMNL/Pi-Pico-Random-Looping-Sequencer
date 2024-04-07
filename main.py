@@ -42,7 +42,7 @@ i2c = machine.I2C(i2c_channel, sda=machine.Pin(sda), scl=machine.Pin(scl))
 dac = mcp4725.MCP4725(i2c, mcp4725.BUS_ADDRESS[0])
 
 # setup pins
-clock_in = machine.Pin(clock_input_pin, machine.Pin.OUT, machine.Pin.PULL_DOWN)
+clock_in = machine.Pin(clock_input_pin, machine.Pin.IN, machine.Pin.PULL_DOWN)
 
 # sequencer variables
 MAX_NUMBER_OF_STEPS = 16
@@ -70,7 +70,7 @@ scale_menu = m.SingleSelectVerticalScrollMenu(
 )
 
 cv_prob_menu = m.NumericalValueRangeMenu(
-    "CVProb", selected=cv_probability_of_change, increment=20
+    "CVProb", selected=cv_probability_of_change, increment=5
 )
 
 steps_menu = m.NumericalValueRangeMenu(
@@ -96,7 +96,7 @@ m.set_submenus(submenu_list=submenus)
 def handle_clock_pulse() -> None:
     global current_step, step_changed_on_clock_pulse, clock_in, number_of_steps
     if current_step < number_of_steps:
-        if clock_in.value() == 1 and step_changed_on_clock_pulse == False:
+        if clock_in.value() == 0 and step_changed_on_clock_pulse == False:
             step_changed_on_clock_pulse = True
             change_step_cv()
             dac.write(cv_sequence[current_step])
@@ -105,7 +105,7 @@ def handle_clock_pulse() -> None:
             print("Step: ", current_step)
             print(cv_sequence[current_step])
             current_step += 1
-        if clock_in.value() == 0 and step_changed_on_clock_pulse == True:
+        if clock_in.value() == 1 and step_changed_on_clock_pulse == True:
             step_changed_on_clock_pulse = False
     else:
         current_step = 0
@@ -187,6 +187,6 @@ def update_sequencer_values() -> None:
 
 # loop
 while True:
-    # todo update sequencer values only when changed
+    # todo implement analog input
     m.loop_main_menu(update_main_program_values_callback=update_sequencer_values)
     handle_clock_pulse()

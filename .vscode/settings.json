@@ -1,29 +1,25 @@
 {
-    "python.linting.enabled": true,
-    "python.languageServer": "Pylance",
-    "python.analysis.typeCheckingMode": "basic",
-    "python.analysis.diagnosticSeverityOverrides": {
-        "reportMissingModuleSource": "none"
-    },
-    "micropico.syncFolder": "",
-    "micropico.openOnStart": true,
-    "python.analysis.typeshedPaths": [
-        ".vscode\\Pico-W-Stub"
-    ],
-    "python.analysis.extraPaths": [
-        ".vscode\\Pico-W-Stub",
-        "./lib"
-    ],
-    "cSpell.words": [
-        "Bakewell",
-        "hijaroshi",
-        "insen",
-        "iwato",
-        "locrian",
-        "mixolydian",
-        "octatonic",
-        "Pico",
-        "rtype"
-    ],
-    "editor.formatOnSave": true
+  "python.linting.enabled": true,
+  "python.languageServer": "Pylance",
+  "python.analysis.typeCheckingMode": "basic",
+  "python.analysis.diagnosticSeverityOverrides": {
+    "reportMissingModuleSource": "none"
+  },
+  "micropico.syncFolder": "",
+  "micropico.openOnStart": true,
+  "python.analysis.typeshedPaths": [".vscode\\Pico-W-Stub"],
+  "python.analysis.extraPaths": [".vscode\\Pico-W-Stub", "./lib"],
+  "cSpell.words": [
+    "Bakewell",
+    "deadzone",
+    "hijaroshi",
+    "insen",
+    "iwato",
+    "locrian",
+    "mixolydian",
+    "octatonic",
+    "Pico",
+    "rtype"
+  ],
+  "editor.formatOnSave": true
 }

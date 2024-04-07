@@ -3,7 +3,21 @@ Made to aid in making a menu system for the Pi Pico with an Oled Screen and a ro
 
 Currently tested and working for 128px * 64px OLED displays
 
-Main menu
+Wiring:
+OLED
+OLED SDA to GP16
+OLED SCL to GP17
+OLED VCC to 3.3V
+OLED GND to GND
+
+Encoder (no breakout board)
+ROT Pin 1 to GP19
+ROT Pin 2 to GND
+ROT Pin 3 to GP18
+SW Pin 1 to GND
+SW Pin 2 to GP20
+
+Main menu (Code currently assumes that you only have 1 main menu)
     - has a list of submenus
     - displays current values of children (submenus)
     - can change/edit selected value of a child (submenu)
@@ -31,10 +45,20 @@ from ssd1306 import SSD1306_I2C
 from rotary_irq_rp2 import RotaryIRQ
 from mp_button import Button
 
-i2c = machine.I2C(0, sda=machine.Pin(16), scl=machine.Pin(17))
-display = SSD1306_I2C(128, 64, i2c)
-r = RotaryIRQ(pin_num_clk=18,
-              pin_num_dt=19,
+# Pins
+SDA_PIN = 16
+SCL_PIN = 17
+DISPLAY_WIDTH = 128
+DISPLAY_HEIGHT = 64
+ROTARY_CLK_PIN = 18
+ROTARY_DT_PIN = 19
+ROTARY_BUTTON_PIN = 20
+
+# Initialize hardware
+i2c = machine.I2C(0, sda=machine.Pin(SDA_PIN), scl=machine.Pin(SCL_PIN))
+display = SSD1306_I2C(DISPLAY_WIDTH, DISPLAY_HEIGHT, i2c)
+r = RotaryIRQ(pin_num_clk=ROTARY_CLK_PIN,
+              pin_num_dt=ROTARY_DT_PIN,
               reverse=False,
               pull_up=True,
               range_mode=RotaryIRQ.RANGE_BOUNDED)
@@ -143,7 +167,7 @@ def button_action(pin, event) -> None:
             current_menu_index = -1
 
 
-b = Button(20, internal_pullup=True, callback=button_action)
+b = Button(ROTARY_BUTTON_PIN, internal_pullup=True, callback=button_action)
 
 
 def exit_main_menu_loop() -> bool:
@@ -200,7 +224,7 @@ class SingleSelectVerticalScrollMenu(Submenu):
         self.menu_start_index = 0
         self.total_lines = total_lines
         self.highlighted_index = 0
-
+    
     def set_selected(self, selected: int) -> None:
         """Sets selected attribute to the referenced index's string value from the items list"""
         self.selected = self.items[selected]
