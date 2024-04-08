@@ -31,10 +31,17 @@ import mcp4725_musical_scales as sc
 import random
 import menu as m
 
+from analog_reader import AnalogueReader
+from machine import ADC
+
 # pins
 sda = 16
 scl = 17
 clock_input_pin = 22
+A0 = 26
+A1 = 27
+A2 = 28
+A3 = 29
 
 # i2c
 i2c_channel = 0
@@ -91,6 +98,12 @@ octaves_menu = m.NumericalValueRangeMenu(
 
 submenus = [scale_menu, cv_prob_menu, steps_menu, octaves_menu]
 m.set_submenus(submenu_list=submenus)
+
+# analog inputs
+cv1 = AnalogueReader(A3)
+cv2 = AnalogueReader(A2)
+cv3 = AnalogueReader(A1)
+cv4 = AnalogueReader(A0)
 
 
 def handle_clock_pulse() -> None:
@@ -188,5 +201,7 @@ def update_sequencer_values() -> None:
 # loop
 while True:
     # todo implement analog input
+    cv1_voltage = cv1.range()
+    print(f"cv1: {cv1_voltage}")
     m.loop_main_menu(update_main_program_values_callback=update_sequencer_values)
     handle_clock_pulse()
