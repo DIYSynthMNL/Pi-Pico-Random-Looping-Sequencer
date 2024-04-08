@@ -11,13 +11,16 @@
   "python.analysis.extraPaths": [".vscode\\Pico-W-Stub", "./lib"],
   "cSpell.words": [
     "Bakewell",
+    "consts",
     "deadzone",
+    "Eurorack",
     "hijaroshi",
     "insen",
     "iwato",
     "locrian",
     "mixolydian",
     "octatonic",
+    "oversample",
     "Pico",
     "rtype"
   ],
