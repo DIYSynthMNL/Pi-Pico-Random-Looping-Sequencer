@@ -63,11 +63,13 @@ MIN_NUMBER_OF_STEPS = 2
 MAX_NUMBER_OF_OCTAVES = 5
 MIN_NUMBER_OF_OCTAVES = 1
 cv_sequence = []
+zero_cv_sequence = [816,816,816,816,816,816,816,816,816,816,816,816,816,816,816,816]
+test_cv_sequence = []
 current_step = 0
 number_of_steps = 16  # user can edit from 1 to any
 step_changed_on_clock_pulse = False
 cv_probability_of_change = 100  # user can edit 0 to 100
-boolean_value = False
+is_test_cv_sequence = False
 
 # scales
 scale_intervals = sc.get_intervals()
@@ -117,9 +119,9 @@ starting_note_menu = m.NumericalValueRangeMenu(
     max_val=36,
 )
 
-boolean_menu = m.ToggleMenu("ToggleMenu", button=main_menu.button, value = boolean_value)
+test_cv_scale_toggle = m.ToggleMenu("TestScale", button=main_menu.button, value = is_test_cv_sequence)
 
-submenus = [scale_menu, cv_prob_menu, steps_menu, octaves_menu, starting_note_menu, boolean_menu]
+submenus = [scale_menu, cv_prob_menu, steps_menu, octaves_menu, starting_note_menu, test_cv_scale_toggle]
 main_menu.set_submenus(submenu_list=submenus)
 
 # analog inputs
@@ -133,9 +135,13 @@ def handle_clock_pulse() -> None:
     global current_step, step_changed_on_clock_pulse, clock_in, number_of_steps
     if current_step < number_of_steps:
         if clock_in.value() == 0 and step_changed_on_clock_pulse == False:
+            test_cv_sequence = get_test_sequence()
             step_changed_on_clock_pulse = True
             change_step_cv()
-            dac.write(cv_sequence[current_step])
+            if is_test_cv_sequence:
+                dac.write(test_cv_sequence[current_step])
+            else:
+                dac.write(cv_sequence[current_step])
             if current_step == 0:
                 pass
                 # print(cv_sequence)
@@ -156,6 +162,10 @@ def change_step_cv() -> None:
     if generate_boolean_with_probability(cv_probability_of_change):
         # print("change cv")
         cv_sequence[current_step] = current_12bit_scale[random_scale_index]
+
+def clear_current_step_cv() -> None:
+    # TODO
+    pass
 
 
 def generate_boolean_with_probability(probability: float) -> bool:
@@ -178,8 +188,17 @@ def populate_sequence_with_default() -> None:
     for _ in range(0, MAX_NUMBER_OF_STEPS):
         cv_sequence.append(current_12bit_scale[0])
 
+def get_test_sequence() -> list[int]:
+    sequence = []
+    while len(sequence) < MAX_NUMBER_OF_STEPS:
+        for cv_value in current_12bit_scale:
+            if len(sequence) < MAX_NUMBER_OF_STEPS:
+                sequence.append(cv_value)
+    # print(sequence)
+    return sequence
 
 # initialize sequencer
+test_cv_sequence = get_test_sequence()
 populate_sequence_with_default()
 print("Current scale:", current_12bit_scale)
 print("Sequence:", cv_sequence)
@@ -194,38 +213,38 @@ def update_sequencer_values() -> None:
         number of steps,
         number of octaves
     """
-    global current_12bit_scale, cv_probability_of_change, number_of_steps, current_scale_interval, number_of_octaves, starting_note, boolean_value
+    global current_12bit_scale, cv_probability_of_change, number_of_steps, current_scale_interval, number_of_octaves, starting_note, is_test_cv_sequence, test_cv_sequence
     print("update_sequencer_values")
     submenus = main_menu.get_submenu_list()
     for submenu in submenus:
-        if submenu.name is "Scale":
+        if submenu.name is scale_menu.name:
             if current_scale_interval != submenu.selected:
                 current_scale_interval = submenu.selected
                 print("Scale changed:", current_scale_interval)
 
-        elif submenu.name is "CVProb":
+        elif submenu.name is cv_prob_menu.name:
             if cv_probability_of_change != submenu.selected:
                 cv_probability_of_change = submenu.selected
                 print("CV probability changed:", cv_probability_of_change)
 
-        elif submenu.name is "Steps":
+        elif submenu.name is steps_menu.name:
             if number_of_steps != submenu.selected:
                 number_of_steps = submenu.selected
                 print("Number of steps changed", number_of_steps)
 
-        elif submenu.name is "Octaves":
+        elif submenu.name is octaves_menu.name:
             if number_of_octaves != submenu.selected:
                 number_of_octaves = submenu.selected
                 print("Number of octaves changed:", number_of_octaves)
 
-        elif submenu.name is "Start note":
+        elif submenu.name is starting_note_menu.name:
             if starting_note != submenu.selected:
                 starting_note = submenu.selected
                 print("Starting note changed:", starting_note)
 
-        elif submenu.name is "ToggleMenu":
-            if boolean_value != submenu.value:
-                boolean_value = submenu.value
+        elif submenu.name is test_cv_scale_toggle.name:
+            if is_test_cv_sequence != submenu.value:
+                is_test_cv_sequence = submenu.value
                 print("ToggleMenu changed:", submenu.value)
 
         else:
