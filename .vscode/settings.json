@@ -7,8 +7,13 @@
   },
   "micropico.syncFolder": "",
   "micropico.openOnStart": true,
-  "python.analysis.typeshedPaths": [".vscode\\Pico-W-Stub"],
-  "python.analysis.extraPaths": [".vscode\\Pico-W-Stub", "./lib"],
+  "python.analysis.typeshedPaths": [
+    "~/.micropico-stubs/included"
+  ],
+  "python.analysis.extraPaths": [
+    "./lib",
+    "~/.micropico-stubs/included"
+  ],
   "cSpell.words": [
     "Bakewell",
     "consts",
