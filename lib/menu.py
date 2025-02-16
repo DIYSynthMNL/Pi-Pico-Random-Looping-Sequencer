@@ -193,7 +193,7 @@ class MainMenu():
             self.submenu_started = True
         # do submenu update loop
         if self.submenu_started is True and self.submenu_editing is True:
-            print("submenu started and editing")
+            # print("submenu started and editing")
             if self.current_submenu is not None:
                 if not isinstance(self.current_submenu, ToggleMenu):
                     self.current_submenu.read_and_update_rotary_value()
