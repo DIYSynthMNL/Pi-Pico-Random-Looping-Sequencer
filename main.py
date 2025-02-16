@@ -81,16 +81,19 @@ current_12bit_scale = sc.get_scale_of_12_bit_values(
 intervals = sc.get_intervals()
 
 # menu
+main_menu = m.MainMenu()
+
 scale_menu = m.SingleSelectVerticalScrollMenu(
-    "Scale", selected=current_scale_interval, items=scale_intervals
+    "Scale", button=main_menu.button, 
+    selected=current_scale_interval, items=scale_intervals
 )
 
 cv_prob_menu = m.NumericalValueRangeMenu(
-    "CVProb", selected=cv_probability_of_change, increment=5
+    "CVProb",button=main_menu.button, selected=cv_probability_of_change, increment=5
 )
 
 steps_menu = m.NumericalValueRangeMenu(
-    "Steps",
+    "Steps",button=main_menu.button,  
     selected=number_of_steps,
     increment=1,
     min_val=MIN_NUMBER_OF_STEPS,
@@ -98,7 +101,7 @@ steps_menu = m.NumericalValueRangeMenu(
 )
 
 octaves_menu = m.NumericalValueRangeMenu(
-    "Octaves",
+    "Octaves",button=main_menu.button, 
     selected=number_of_octaves,
     increment=1,
     min_val=MIN_NUMBER_OF_OCTAVES,
@@ -106,15 +109,17 @@ octaves_menu = m.NumericalValueRangeMenu(
 )
 
 starting_note_menu = m.NumericalValueRangeMenu(
-    "Start note", 
+    "Start note", button=main_menu.button, 
     selected=0, 
     increment=1, 
     min_val=0, 
     max_val=36,
 )
 
-submenus = [scale_menu, cv_prob_menu, steps_menu, octaves_menu, starting_note_menu]
-m.set_submenus(submenu_list=submenus)
+boolean_menu = m.ToggleMenu("ToggleMenu", button=main_menu.button, value = False)
+
+submenus = [scale_menu, cv_prob_menu, steps_menu, octaves_menu, starting_note_menu, boolean_menu]
+main_menu.set_submenus(submenu_list=submenus)
 
 # analog inputs
 cv1 = AnalogueReader(A3)
@@ -190,7 +195,7 @@ def update_sequencer_values() -> None:
     """
     global current_12bit_scale, cv_probability_of_change, number_of_steps, current_scale_interval, number_of_octaves, starting_note
     print("update_sequencer_values")
-    submenus = m.get_submenu_list()
+    submenus = main_menu.get_submenu_list()
     for submenu in submenus:
         if submenu.name is "Scale":
             if current_scale_interval != submenu.selected:
@@ -229,5 +234,5 @@ while True:
     # todo implement analog input
     cv1_voltage = cv1.range(steps=101,deadzone=0.1)
     # print(f"cv1: {cv1_voltage}")
-    m.loop_main_menu(update_main_program_values_callback=update_sequencer_values)
+    main_menu.loop_main_menu(update_main_program_values_callback=update_sequencer_values)
     handle_clock_pulse()
