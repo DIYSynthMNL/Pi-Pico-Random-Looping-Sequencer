@@ -87,7 +87,8 @@ submenu_started = False
 submenu_editing = False
 current_submenu = None
 main_menu_started = False
-total_lines: int = 0
+submenus_length: int = 0
+total_lines: int = 4 # max number of submenu choices that the display can handle
 menu_start_index = 0
 highlighted_index = 0
 val_old = -1
@@ -98,9 +99,9 @@ current_menu_index = -1
 
 
 def set_submenus(submenu_list: list) -> None:
-    global submenus, total_lines
+    global submenus, submenus_length
     submenus = submenu_list
-    total_lines = len(submenu_list)
+    submenus_length = len(submenu_list)
 
 
 def display_menu() -> None:
@@ -115,7 +116,7 @@ def display_menu() -> None:
     display.rect(0, 0, display.width, 15, 1)
 
     # draw submenu lines
-    for i in range(min(total_lines - menu_start_index, total_lines)):
+    for i in range(min(submenus_length - menu_start_index, total_lines)):
         item_index = menu_start_index + i
         submenu_text_line = submenus[item_index].__repr__()
         if item_index == highlighted_index:
@@ -131,7 +132,7 @@ def display_menu() -> None:
 
 
 def scroll(index) -> None:
-    global menu_start_index
+    global menu_start_index, total_lines
     if index > menu_start_index + (total_lines-1):
         menu_start_index += 1
     if index < menu_start_index:
@@ -144,7 +145,7 @@ def start() -> None:
     val_old = -1
     menu_start_index = 0
     highlighted_index = 0
-    r.set(value=0, min_val=0, max_val=total_lines-1, incr=1)
+    r.set(value=0, min_val=0, max_val=submenus_length-1, incr=1)
     main_menu_started = True
     display_menu()
 
@@ -158,15 +159,7 @@ def update() -> None:
         val_old = val_new
         scroll(val_new)
         highlighted_index = val_new
-        new_menu_start_index = max(0, highlighted_index - (4 - 1))
-        menu_start_index = new_menu_start_index
         display_menu()
-        # print("---")
-        # print("Menu Start Index:", menu_start_index)
-        # print("Highlighted Index:", highlighted_index)
-        # print("Number of submenus:", total_lines)
-        # print("Menu start index should be:", new_menu_start_index)
-        # print("---")
 
 
 def button_action(pin, event) -> None:
@@ -305,8 +298,14 @@ class SingleSelectVerticalScrollMenu(Submenu):
         # TODO implement rotary range wrap. When at the top (0), go to bottom if moving line up and vise versa.
         if index > self.menu_start_index + (self.total_lines-1):
             self.menu_start_index += 1
+            print("Scroll +")
         if index < self.menu_start_index:
             self.menu_start_index -= 1
+            print("Scroll -")
+        print("---")
+        print("Index:", index)
+        print("Menu Start Index:", menu_start_index)
+        print("Total lines:", submenus_length)
 
     def update(self) -> None:
         global val_old, val_new
@@ -318,6 +317,11 @@ class SingleSelectVerticalScrollMenu(Submenu):
             self.scroll(val_new)
             self.set_highlighted_index(val_new)
             self.display_menu()
+            print("---")
+            print("Menu Start Index:", self.menu_start_index)
+            print("Highlighted Index:", self.highlighted_index)
+            print("Number of submenus:", self.total_lines)
+            print("---")
 
     def __repr__(self) -> str:
         selected_shortened = self.selected if len(
