@@ -22,6 +22,12 @@ ROT Pin 3 to GP18
 SW Pin 1 to GND
 SW Pin 2 to GP20
 
+Analog inputs
+A0 = GP26
+A1 = GP27
+A2 = GP28
+A3 = GP29
+
 TODO implement control voltage input to change variables
 """
 
@@ -64,12 +70,15 @@ cv_probability_of_change = 100  # user can edit 0 to 100
 
 # scales
 scale_intervals = sc.get_intervals()
-current_scale_interval = "chromatic"
+current_scale_interval = "major"
+starting_note = 12 # start at the next octave to prevent low voltage output issues (the note 0 will not be in tune) refer to the mcp4725 1vOct table
+number_of_octaves = 1
 current_12bit_scale = sc.get_scale_of_12_bit_values(
-    scale_interval=current_scale_interval
+    scale_interval=current_scale_interval,
+    starting_note=starting_note,
+    octaves=number_of_octaves,
 )
 intervals = sc.get_intervals()
-number_of_octaves = 1
 
 # menu
 scale_menu = m.SingleSelectVerticalScrollMenu(
@@ -96,7 +105,15 @@ octaves_menu = m.NumericalValueRangeMenu(
     max_val=MAX_NUMBER_OF_OCTAVES,
 )
 
-submenus = [scale_menu, cv_prob_menu, steps_menu, octaves_menu]
+starting_note_menu = m.NumericalValueRangeMenu(
+    "Start note", 
+    selected=0, 
+    increment=1, 
+    min_val=0, 
+    max_val=36,
+)
+
+submenus = [scale_menu, cv_prob_menu, steps_menu, octaves_menu, starting_note_menu]
 m.set_submenus(submenu_list=submenus)
 
 # analog inputs
@@ -114,9 +131,10 @@ def handle_clock_pulse() -> None:
             change_step_cv()
             dac.write(cv_sequence[current_step])
             if current_step == 0:
-                print(cv_sequence)
-            print("Step: ", current_step)
-            print(cv_sequence[current_step])
+                pass
+                # print(cv_sequence)
+            # print("Step: ", current_step)
+            # print(cv_sequence[current_step])
             current_step += 1
         if clock_in.value() == 1 and step_changed_on_clock_pulse == True:
             step_changed_on_clock_pulse = False
@@ -130,7 +148,7 @@ def change_step_cv() -> None:
     random_scale_index = random.randint(0, len(current_12bit_scale) - 1)
     # set cv from scale list
     if generate_boolean_with_probability(cv_probability_of_change):
-        print("change cv")
+        # print("change cv")
         cv_sequence[current_step] = current_12bit_scale[random_scale_index]
 
 
@@ -163,13 +181,14 @@ print("Sequence:", cv_sequence)
 
 def update_sequencer_values() -> None:
     """
+    Once the submenu's value is changed (rotary button clicked) it should update the global varable changed
     Updates sequencer values such as:
         scale,
         cv probability,
         number of steps,
         number of octaves
     """
-    global current_12bit_scale, cv_probability_of_change, number_of_steps, current_scale_interval, number_of_octaves
+    global current_12bit_scale, cv_probability_of_change, number_of_steps, current_scale_interval, number_of_octaves, starting_note
     print("update_sequencer_values")
     submenus = m.get_submenu_list()
     for submenu in submenus:
@@ -193,15 +212,22 @@ def update_sequencer_values() -> None:
                 number_of_octaves = submenu.selected
                 print("Number of octaves changed:", number_of_octaves)
 
+        elif submenu.name is "Start note":
+            if starting_note != submenu.selected:
+                starting_note = submenu.selected
+                print("Starting note changed:", starting_note)
+
     current_12bit_scale = sc.get_scale_of_12_bit_values(
-        scale_interval=current_scale_interval, octaves=number_of_octaves
+        starting_note=starting_note+12,
+        scale_interval=current_scale_interval,
+        octaves=number_of_octaves,
     )
 
 
 # loop
 while True:
     # todo implement analog input
-    cv1_voltage = cv1.range()
-    print(f"cv1: {cv1_voltage}")
+    cv1_voltage = cv1.range(steps=101,deadzone=0.1)
+    # print(f"cv1: {cv1_voltage}")
     m.loop_main_menu(update_main_program_values_callback=update_sequencer_values)
     handle_clock_pulse()
