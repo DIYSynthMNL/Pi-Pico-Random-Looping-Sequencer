@@ -112,9 +112,11 @@ class MainMenu():
         display.rect(0, 0, display.width, 15, 1)
 
         # draw submenu lines
+        print('---Submenu lines---')
         for i in range(min(self.submenus_length - self.menu_start_index, self.total_lines)):
             item_index = self.menu_start_index + i
             submenu_text_line = self.submenus[item_index].__repr__()
+            print(submenu_text_line)
             if item_index == self.highlighted_index:
                 # draw highlighted item
                 display.fill_rect(0, ((i * (line_height+spacer))-1) +
@@ -124,6 +126,7 @@ class MainMenu():
             else:
                 display.text(f'{submenu_text_line}', 0,
                             (i*(line_height+spacer))+pixel_y_shift, 1)
+        print('-------------------')
         display.show()
 
     def scroll_main_menu(self, index) -> None:
@@ -155,25 +158,24 @@ class MainMenu():
     def button_action(self, pin, event) -> None:
         global val_new
         if event == Button.PRESSED:
+            print("current_menu_index:", self.current_menu_index)
             if self.current_menu_index == -1:
                 # button pressed in main menu
                 # latch on submenu selected
                 self.current_submenu = self.submenus[self.highlighted_index]
-                if not isinstance(self.current_submenu, ToggleMenu):
-                    self.submenu_started = False
-                    self.submenu_editing = True
-                else:
+                if isinstance(self.current_submenu, ToggleMenu):
                     self.current_submenu.toggle()
+                self.submenu_started = False
+                self.submenu_editing = True
             else:
-                if not isinstance(self.current_submenu, ToggleMenu):
-                    # button pressed inside a submenu
-                    self.submenu_started = False
-                    self.submenu_editing = False
-                    # change selected on current_submenu
-                    if self.current_submenu != None:
-                        self.current_submenu.set_selected(val_new)
-                    # go back to main menu
-                    self.current_menu_index = -1
+                # button pressed inside a submenu
+                self.submenu_started = False
+                self.submenu_editing = False
+                # change selected on current_submenu
+                if self.current_submenu != None:
+                    self.current_submenu.set_selected(val_new)
+                # go back to main menu
+                self.current_menu_index = -1
 
     def is_main_menu_loop_exitable(self) -> bool:
         return True if self.submenu_editing is True else False
@@ -183,14 +185,21 @@ class MainMenu():
         self.main_menu_started = False
         # start submenu
         if self.submenu_started is False and self.submenu_editing is True:
-            self.current_menu_index = val_new
+            if not isinstance(self.current_submenu, ToggleMenu):
+                self.current_menu_index = val_new
             if self.current_submenu is not None:
-                self.current_submenu.start()
+                if not isinstance(self.current_submenu, ToggleMenu):
+                    self.current_submenu.start()
             self.submenu_started = True
         # do submenu update loop
         if self.submenu_started is True and self.submenu_editing is True:
+            print("submenu started and editing")
             if self.current_submenu is not None:
-                self.current_submenu.update()
+                if not isinstance(self.current_submenu, ToggleMenu):
+                    self.current_submenu.read_and_update_rotary_value()
+                else:
+                    self.submenu_started = False
+                    self.submenu_editing = False
     
     def get_submenu_list(self) -> list:
         return self.submenus
@@ -284,7 +293,7 @@ class SingleSelectVerticalScrollMenu(Submenu):
         if index < self.menu_start_index:
             self.menu_start_index -= 1
 
-    def update(self) -> None:
+    def read_and_update_rotary_value(self) -> None:
         global val_new, val_old
         val_new = rotary.value()
         self.button.update()
@@ -344,7 +353,7 @@ class NumericalValueRangeMenu(Submenu):
         display.text(text, 0, 31, 0)
         display.show()
 
-    def update(self) -> None:
+    def read_and_update_rotary_value(self) -> None:
         global val_new, val_old
         val_new = rotary.value()
         self.button.update()
@@ -359,16 +368,15 @@ class NumericalValueRangeMenu(Submenu):
 class ToggleMenu(Submenu):
     """A submenu type that lets a user toggle a boolean value using the rotary encoder's button"""
     
-    def __init__(self, name: str, button: Button, *, value: bool = False) -> None:
+    def __init__(self, name: str, button: Button, *, value: bool) -> None:
         super().__init__(name, value, button)
         self.value = value
     
     def toggle(self) -> None:
         self.value = not self.value
-        print('ToggleMenu toggled:', self.value)
     
     def __repr__(self) -> str:
-        return f'{self.name}:{self.selected}'
+        return f'{self.name}:{self.value}'
 
 
 def remove_vowels(word: str) -> str:

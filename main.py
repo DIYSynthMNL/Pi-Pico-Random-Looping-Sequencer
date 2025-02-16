@@ -67,6 +67,7 @@ current_step = 0
 number_of_steps = 16  # user can edit from 1 to any
 step_changed_on_clock_pulse = False
 cv_probability_of_change = 100  # user can edit 0 to 100
+boolean_value = False
 
 # scales
 scale_intervals = sc.get_intervals()
@@ -116,7 +117,7 @@ starting_note_menu = m.NumericalValueRangeMenu(
     max_val=36,
 )
 
-boolean_menu = m.ToggleMenu("ToggleMenu", button=main_menu.button, value = False)
+boolean_menu = m.ToggleMenu("ToggleMenu", button=main_menu.button, value = boolean_value)
 
 submenus = [scale_menu, cv_prob_menu, steps_menu, octaves_menu, starting_note_menu, boolean_menu]
 main_menu.set_submenus(submenu_list=submenus)
@@ -193,7 +194,7 @@ def update_sequencer_values() -> None:
         number of steps,
         number of octaves
     """
-    global current_12bit_scale, cv_probability_of_change, number_of_steps, current_scale_interval, number_of_octaves, starting_note
+    global current_12bit_scale, cv_probability_of_change, number_of_steps, current_scale_interval, number_of_octaves, starting_note, boolean_value
     print("update_sequencer_values")
     submenus = main_menu.get_submenu_list()
     for submenu in submenus:
@@ -221,6 +222,14 @@ def update_sequencer_values() -> None:
             if starting_note != submenu.selected:
                 starting_note = submenu.selected
                 print("Starting note changed:", starting_note)
+
+        elif submenu.name is "ToggleMenu":
+            if boolean_value != submenu.value:
+                boolean_value = submenu.value
+                print("ToggleMenu changed:", submenu.value)
+
+        else:
+            print("Error, menu to be updated does not exist!")
 
     current_12bit_scale = sc.get_scale_of_12_bit_values(
         starting_note=starting_note+12,
