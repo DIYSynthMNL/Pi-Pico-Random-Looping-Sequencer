@@ -150,7 +150,7 @@ def start() -> None:
 
 
 def update() -> None:
-    global val_old, highlighted_index
+    global val_old, highlighted_index, menu_start_index
     val_new = r.value()
     b.update()
 
@@ -158,7 +158,15 @@ def update() -> None:
         val_old = val_new
         scroll(val_new)
         highlighted_index = val_new
+        new_menu_start_index = max(0, highlighted_index - (4 - 1))
+        menu_start_index = new_menu_start_index
         display_menu()
+        # print("---")
+        # print("Menu Start Index:", menu_start_index)
+        # print("Highlighted Index:", highlighted_index)
+        # print("Number of submenus:", total_lines)
+        # print("Menu start index should be:", new_menu_start_index)
+        # print("---")
 
 
 def button_action(pin, event) -> None:
