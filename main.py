@@ -63,7 +63,24 @@ MIN_NUMBER_OF_STEPS = 2
 MAX_NUMBER_OF_OCTAVES = 5
 MIN_NUMBER_OF_OCTAVES = 1
 cv_sequence = []
-zero_cv_sequence = [816,816,816,816,816,816,816,816,816,816,816,816,816,816,816,816]
+zero_cv_sequence = [
+    816,
+    816,
+    816,
+    816,
+    816,
+    816,
+    816,
+    816,
+    816,
+    816,
+    816,
+    816,
+    816,
+    816,
+    816,
+    816,
+]
 test_cv_sequence = []
 current_step = 0
 number_of_steps = 16  # user can edit from 1 to any
@@ -74,7 +91,7 @@ is_test_cv_sequence = False
 # scales
 scale_intervals = sc.get_intervals()
 current_scale_interval = "major"
-starting_note = 12 # start at the next octave to prevent low voltage output issues (the note 0 will not be in tune) refer to the mcp4725 1vOct table
+starting_note = 12  # start at the next octave to prevent low voltage output issues (the note 0 will not be in tune) refer to the mcp4725 1vOct table
 number_of_octaves = 1
 current_12bit_scale = sc.get_scale_of_12_bit_values(
     scale_interval=current_scale_interval,
@@ -87,16 +104,19 @@ intervals = sc.get_intervals()
 main_menu = m.MainMenu()
 
 scale_menu = m.SingleSelectVerticalScrollMenu(
-    "Scale", button=main_menu.button, 
-    selected=current_scale_interval, items=scale_intervals
+    "Scale",
+    button=main_menu.button,
+    selected=current_scale_interval,
+    items=scale_intervals,
 )
 
 cv_prob_menu = m.NumericalValueRangeMenu(
-    "CVProb",button=main_menu.button, selected=cv_probability_of_change, increment=5
+    "CVProb", button=main_menu.button, selected=cv_probability_of_change, increment=5
 )
 
 steps_menu = m.NumericalValueRangeMenu(
-    "Steps",button=main_menu.button,  
+    "Steps",
+    button=main_menu.button,
     selected=number_of_steps,
     increment=1,
     min_val=MIN_NUMBER_OF_STEPS,
@@ -104,7 +124,8 @@ steps_menu = m.NumericalValueRangeMenu(
 )
 
 octaves_menu = m.NumericalValueRangeMenu(
-    "Octaves",button=main_menu.button, 
+    "Octaves",
+    button=main_menu.button,
     selected=number_of_octaves,
     increment=1,
     min_val=MIN_NUMBER_OF_OCTAVES,
@@ -112,16 +133,26 @@ octaves_menu = m.NumericalValueRangeMenu(
 )
 
 starting_note_menu = m.NumericalValueRangeMenu(
-    "Start note", button=main_menu.button, 
-    selected=0, 
-    increment=1, 
-    min_val=0, 
+    "Start note",
+    button=main_menu.button,
+    selected=0,
+    increment=1,
+    min_val=0,
     max_val=36,
 )
 
-test_cv_scale_toggle = m.ToggleMenu("TestScale", button=main_menu.button, value = is_test_cv_sequence)
+test_cv_scale_toggle = m.ToggleMenu(
+    "TestScale", button=main_menu.button, value=is_test_cv_sequence
+)
 
-submenus = [scale_menu, cv_prob_menu, steps_menu, octaves_menu, starting_note_menu, test_cv_scale_toggle]
+submenus = [
+    scale_menu,
+    cv_prob_menu,
+    steps_menu,
+    octaves_menu,
+    starting_note_menu,
+    test_cv_scale_toggle,
+]
 main_menu.set_submenus(submenu_list=submenus)
 
 # analog inputs
@@ -163,6 +194,7 @@ def change_step_cv() -> None:
         # print("change cv")
         cv_sequence[current_step] = current_12bit_scale[random_scale_index]
 
+
 def clear_current_step_cv() -> None:
     # TODO
     pass
@@ -188,6 +220,7 @@ def populate_sequence_with_default() -> None:
     for _ in range(0, MAX_NUMBER_OF_STEPS):
         cv_sequence.append(current_12bit_scale[0])
 
+
 def get_test_sequence() -> list[int]:
     sequence = []
     while len(sequence) < MAX_NUMBER_OF_STEPS:
@@ -196,6 +229,7 @@ def get_test_sequence() -> list[int]:
                 sequence.append(cv_value)
     # print(sequence)
     return sequence
+
 
 # initialize sequencer
 test_cv_sequence = get_test_sequence()
@@ -251,7 +285,7 @@ def update_sequencer_values() -> None:
             print("Error, menu to be updated does not exist!")
 
     current_12bit_scale = sc.get_scale_of_12_bit_values(
-        starting_note=starting_note+12,
+        starting_note=starting_note + 12,
         scale_interval=current_scale_interval,
         octaves=number_of_octaves,
     )
@@ -260,7 +294,9 @@ def update_sequencer_values() -> None:
 # loop
 while True:
     # todo implement analog input
-    cv1_voltage = cv1.range(steps=101,deadzone=0.1)
+    cv1_voltage = cv1.range(steps=101, deadzone=0.1)
     # print(f"cv1: {cv1_voltage}")
-    main_menu.loop_main_menu(update_main_program_values_callback=update_sequencer_values)
+    main_menu.loop_main_menu(
+        update_main_program_values_callback=update_sequencer_values
+    )
     handle_clock_pulse()

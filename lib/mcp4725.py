@@ -1,3 +1,9 @@
+"""
+https://github.com/wayoda/micropython-mcp4725/blob/master/mcp4725.py
+All credits go to wayoda
+
+"""
+
 # Library for the MCP4725 I2C bus DAC
 from machine import I2C
 
@@ -5,7 +11,7 @@ from machine import I2C
 BUS_ADDRESS = [0x60, 0x62, 0x63]
 
 # The device supports a few power down modes on startup and during operation
-POWER_DOWN_MODE = {'Off': 0, '1k': 1, '100k': 2, '500k': 3}
+POWER_DOWN_MODE = {"Off": 0, "1k": 1, "100k": 2, "500k": 3}
 
 
 class MCP4725:
@@ -29,11 +35,17 @@ class MCP4725:
             power_down = self._powerDownKey((buf[0] >> 1) & 0x03)
             value = ((buf[1] << 8) | (buf[2])) >> 4
             eeprom_power_down = self._powerDownKey((buf[3] >> 5) & 0x03)
-            eeprom_value = ((buf[3] & 0x0f) << 8) | buf[4]
-            return (eeprom_write_busy, power_down, value, eeprom_power_down, eeprom_value)
+            eeprom_value = ((buf[3] & 0x0F) << 8) | buf[4]
+            return (
+                eeprom_write_busy,
+                power_down,
+                value,
+                eeprom_power_down,
+                eeprom_value,
+            )
         return None
 
-    def config(self, power_down='Off', value=0, eeprom=False):
+    def config(self, power_down="Off", value=0, eeprom=False):
         buf = bytearray()
         conf = 0x40 | (POWER_DOWN_MODE[power_down] << 1)
         if eeprom:
