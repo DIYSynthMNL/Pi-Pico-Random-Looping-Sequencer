@@ -43,7 +43,9 @@ from machine import ADC
 # pins
 sda = 16
 scl = 17
+digital_input_pin = 21
 clock_input_pin = 22
+digital_output_pin = 23
 A0 = 26
 A1 = 27
 A2 = 28
@@ -56,6 +58,8 @@ dac = mcp4725.MCP4725(i2c, mcp4725.BUS_ADDRESS[0])
 
 # setup pins
 clock_in = machine.Pin(clock_input_pin, machine.Pin.IN, machine.Pin.PULL_DOWN)
+digital_in = machine.Pin(digital_input_pin, machine.Pin.IN, machine.Pin.PULL_DOWN)
+digital_out = machine.Pin(digital_output_pin, machine.Pin.OUT, value=0)
 
 # sequencer variables
 MAX_NUMBER_OF_STEPS = 16
@@ -98,7 +102,6 @@ current_12bit_scale = sc.get_scale_of_12_bit_values(
     starting_note=starting_note,
     octaves=number_of_octaves,
 )
-intervals = sc.get_intervals()
 
 # menu
 main_menu = m.MainMenu()
@@ -178,9 +181,11 @@ def handle_clock_pulse() -> None:
                 # print(cv_sequence)
             # print("Step: ", current_step)
             # print(cv_sequence[current_step])
+            digital_out.value(0)
             current_step += 1
         if clock_in.value() == 1 and step_changed_on_clock_pulse == True:
             step_changed_on_clock_pulse = False
+            digital_out.value(1)
     else:
         current_step = 0
 
