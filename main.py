@@ -36,9 +36,9 @@ import mcp4725
 import mcp4725_musical_scales as sc
 import random
 import menu as m
+import analog_reader as analog_reader
 
 from analog_reader import AnalogueReader
-from machine import ADC
 
 # pins
 sda = 16
@@ -85,12 +85,32 @@ zero_cv_sequence = [
     816,
     816,
 ]
+tuning_cv_sequence = [
+    816,
+    1632,
+    816,
+    1632,
+    816,
+    1632,
+    816,
+    1632,
+    816,
+    1632,
+    816,
+    1632,
+    816,
+    1632,
+    816,
+    1632,
+]
 test_cv_sequence = []
 current_step = 0
 number_of_steps = 16  # user can edit from 1 to any
 step_changed_on_clock_pulse = False
-cv_probability_of_change = 100  # user can edit 0 to 100
+cv_probability_of_change = 0  # user can edit 0 to 100
+is_cv_erase = False
 is_test_cv_sequence = False
+is_tuning_cv_sequence = False
 
 # scales
 scale_intervals = sc.get_intervals()
@@ -144,8 +164,16 @@ starting_note_menu = m.NumericalValueRangeMenu(
     max_val=36,
 )
 
-test_cv_scale_toggle = m.ToggleMenu(
+cv_erase_toggle_menu = m.ToggleMenu(
+    "CvErase", button=main_menu.button, value=is_cv_erase
+)
+
+test_cv_scale_toggle_menu = m.ToggleMenu(
     "TestScale", button=main_menu.button, value=is_test_cv_sequence
+)
+
+is_tuning_cv_scale_menu = m.ToggleMenu(
+    "TuningScale", button=main_menu.button, value=is_tuning_cv_sequence
 )
 
 submenus = [
@@ -154,7 +182,9 @@ submenus = [
     steps_menu,
     octaves_menu,
     starting_note_menu,
-    test_cv_scale_toggle,
+    cv_erase_toggle_menu,
+    test_cv_scale_toggle_menu,
+    is_tuning_cv_scale_menu,
 ]
 main_menu.set_submenus(submenu_list=submenus)
 
@@ -172,8 +202,12 @@ def handle_clock_pulse() -> None:
             test_cv_sequence = get_test_sequence()
             step_changed_on_clock_pulse = True
             change_step_cv()
+            if is_cv_erase:
+                cv_sequence[current_step] = current_12bit_scale[0]
             if is_test_cv_sequence:
                 dac.write(test_cv_sequence[current_step])
+            elif is_tuning_cv_sequence:
+                dac.write(tuning_cv_sequence[current_step])
             else:
                 dac.write(cv_sequence[current_step])
             if current_step == 0:
@@ -252,42 +286,53 @@ def update_sequencer_values() -> None:
         number of steps,
         number of octaves
     """
-    global current_12bit_scale, cv_probability_of_change, number_of_steps, current_scale_interval, number_of_octaves, starting_note, is_test_cv_sequence, test_cv_sequence
+    global current_12bit_scale, cv_probability_of_change, number_of_steps, current_scale_interval, number_of_octaves, starting_note, is_test_cv_sequence, test_cv_sequence, is_cv_erase, is_tuning_cv_sequence
     print("update_sequencer_values")
     submenus = main_menu.get_submenu_list()
     for submenu in submenus:
         if submenu.name is scale_menu.name:
             if current_scale_interval != submenu.selected:
                 current_scale_interval = submenu.selected
-                print("Scale changed:", current_scale_interval)
+                # print("Scale changed:", current_scale_interval)
 
         elif submenu.name is cv_prob_menu.name:
             if cv_probability_of_change != submenu.selected:
                 cv_probability_of_change = submenu.selected
-                print("CV probability changed:", cv_probability_of_change)
+                # print("CV probability changed:", cv_probability_of_change)
 
         elif submenu.name is steps_menu.name:
             if number_of_steps != submenu.selected:
                 number_of_steps = submenu.selected
-                print("Number of steps changed", number_of_steps)
+                # print("Number of steps changed", number_of_steps)
 
         elif submenu.name is octaves_menu.name:
             if number_of_octaves != submenu.selected:
                 number_of_octaves = submenu.selected
-                print("Number of octaves changed:", number_of_octaves)
+                # print("Number of octaves changed:", number_of_octaves)
 
         elif submenu.name is starting_note_menu.name:
             if starting_note != submenu.selected:
                 starting_note = submenu.selected
-                print("Starting note changed:", starting_note)
+                # print("Starting note changed:", starting_note)
 
-        elif submenu.name is test_cv_scale_toggle.name:
+        elif submenu.name is cv_erase_toggle_menu.name:
+            if is_cv_erase != submenu.value:
+                is_cv_erase = submenu.value
+                # print("ToggleMenu changed:", submenu.value)
+
+        elif submenu.name is test_cv_scale_toggle_menu.name:
             if is_test_cv_sequence != submenu.value:
                 is_test_cv_sequence = submenu.value
-                print("ToggleMenu changed:", submenu.value)
+                # print("ToggleMenu changed:", submenu.value)
+
+        elif submenu.name is is_tuning_cv_scale_menu.name:
+            if is_tuning_cv_sequence != submenu.value:
+                is_tuning_cv_sequence = submenu.value
+                # print("ToggleMenu changed:", submenu.value)
 
         else:
-            print("Error, menu to be updated does not exist!")
+            pass
+            # print("Error, menu to be updated does not exist!")
 
     current_12bit_scale = sc.get_scale_of_12_bit_values(
         starting_note=starting_note + 12,
@@ -296,11 +341,20 @@ def update_sequencer_values() -> None:
     )
 
 
+# previous_cv1_value = 0
+
 # loop
 while True:
     # todo implement analog input
-    cv1_voltage = cv1.range(steps=101, deadzone=0.1)
-    # print(f"cv1: {cv1_voltage}")
+    # cv1_value = cv1.choice(list(range(0, 101, 5)), deadzone=0.1)
+
+    # if previous_cv1_value != cv1_value:
+    #     # cv1 changed
+    #     cv_probability_of_change = cv1_value
+    #     # cv_prob_menu.set_selected(cv_probability_of_change)
+    #     # main_menu.initialize_main_menu()
+    #     previous_cv1_value = cv1_value
+
     main_menu.loop_main_menu(
         update_main_program_values_callback=update_sequencer_values
     )

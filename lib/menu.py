@@ -135,13 +135,13 @@ class MainMenu:
         display.rect(0, 0, display.width, 15, 1)
 
         # draw submenu lines
-        print("---Submenu lines---")
+        # print("---Submenu lines---")
         for i in range(
             min(self.submenus_length - self.menu_start_index, self.total_lines)
         ):
             item_index = self.menu_start_index + i
             submenu_text_line = self.submenus[item_index].__repr__()
-            print(submenu_text_line)
+            # print(submenu_text_line)
             if item_index == self.highlighted_index:
                 # draw highlighted item
                 display.fill_rect(
@@ -164,7 +164,7 @@ class MainMenu:
                     (i * (line_height + spacer)) + pixel_y_shift,
                     1,
                 )
-        print("-------------------")
+        # print("-------------------")
         display.show()
 
     def scroll_main_menu(self, index) -> None:
@@ -185,7 +185,7 @@ class MainMenu:
         )
         self.main_menu_started = True
         self.draw_main_menu()
-        print("Initialized main menu")
+        # print("Initialized main menu")
 
     def read_and_update_rotary_value(self) -> None:
         global rotary_val_new, rotary_val_old
@@ -473,7 +473,25 @@ class ToggleMenu(Submenu):
         self.value = not self.value
 
     def __repr__(self) -> str:
-        return f"{self.name}:{self.value}"
+        bool_str = "Off"
+        if self.value:
+            bool_str = "On"
+        else:
+            bool_str = "Off"
+        return f"{self.name}:{bool_str}"
+
+
+class CVMenu(Submenu):
+    """A submenu type that lets a user see all 4 cv values in realtime"""
+
+    def __init__(
+        self,
+        name: str,
+        button: Button,
+    ) -> None:
+        super().__init__(name, None, button)
+
+    # TODO
 
 
 def remove_vowels(word: str) -> str:
