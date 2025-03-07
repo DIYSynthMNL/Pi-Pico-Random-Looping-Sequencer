@@ -37,7 +37,6 @@ import mcp4725_musical_scales as sc
 import random
 import menu as m
 import analog_reader as analog_reader
-
 from analog_reader import AnalogueReader
 
 # pins
@@ -67,24 +66,7 @@ MIN_NUMBER_OF_STEPS = 2
 MAX_NUMBER_OF_OCTAVES = 5
 MIN_NUMBER_OF_OCTAVES = 1
 cv_sequence = []
-zero_cv_sequence = [
-    816,
-    816,
-    816,
-    816,
-    816,
-    816,
-    816,
-    816,
-    816,
-    816,
-    816,
-    816,
-    816,
-    816,
-    816,
-    816,
-]
+trigger_sequence = []
 tuning_cv_sequence = [
     816,
     1632,
@@ -108,6 +90,7 @@ current_step = 0
 number_of_steps = 16  # user can edit from 1 to any
 step_changed_on_clock_pulse = False
 cv_probability_of_change = 0  # user can edit 0 to 100
+trigger_probability_of_change = 0
 is_cv_erase = False
 is_test_cv_sequence = False
 is_tuning_cv_sequence = False
@@ -201,30 +184,34 @@ def handle_clock_pulse() -> None:
         if clock_in.value() == 0 and step_changed_on_clock_pulse == False:
             test_cv_sequence = get_test_sequence()
             step_changed_on_clock_pulse = True
-            change_step_cv()
+            randomly_change_current_step_cv()
             if is_cv_erase:
                 cv_sequence[current_step] = current_12bit_scale[0]
+            # check which cv sequence to output
             if is_test_cv_sequence:
+                # outputs a cv sequence that runs through the scale ascending
                 dac.write(test_cv_sequence[current_step])
             elif is_tuning_cv_sequence:
                 dac.write(tuning_cv_sequence[current_step])
             else:
+                # output cv
                 dac.write(cv_sequence[current_step])
             if current_step == 0:
                 pass
                 # print(cv_sequence)
             # print("Step: ", current_step)
             # print(cv_sequence[current_step])
-            digital_out.value(0)
+            # TODO: trigger erase
+            # output trigger
+            digital_out.value(trigger_sequence[current_step])
             current_step += 1
         if clock_in.value() == 1 and step_changed_on_clock_pulse == True:
             step_changed_on_clock_pulse = False
-            digital_out.value(1)
     else:
         current_step = 0
 
 
-def change_step_cv() -> None:
+def randomly_change_current_step_cv() -> None:
     global cv_sequence, current_12bit_scale, cv_probability_of_change
     # get random index of scale chosen
     random_scale_index = random.randint(0, len(current_12bit_scale) - 1)
@@ -233,10 +220,11 @@ def change_step_cv() -> None:
         # print("change cv")
         cv_sequence[current_step] = current_12bit_scale[random_scale_index]
 
-
-def clear_current_step_cv() -> None:
-    # TODO
-    pass
+def randomly_change_step_trigger() -> None:
+    global trigger_sequence
+    trig_on_or_off = random.randint(0, 1)
+    if generate_boolean_with_probability(trigger_probability_of_change):
+        trigger_sequence[current_step] = trig_on_or_off
 
 
 def generate_boolean_with_probability(probability: float) -> bool:
