@@ -1,29 +1,37 @@
-A random generator Eurorack module
+# A random generator Eurorack module
 
-Features:
+## Features
+
+- 128x64 oled screen
+- Encoder
 - A random step cv sequencer
 - Output cv quantized based on scale chosen
 - 4 Analog parameter knobs with inputs
 
-IO:
+## IO
+
 - 4 Analog knobs with tied inputs with input level knobs
 - Trig in
 - Digital input
 - Digital output
 - Analog CV output
 
-Development instructions:
+## Development instructions
 
 - Turn on the module (eurorack power)
 - Plug in the usb (yes it won't damage the pico)
 
+### Developing with VSCode
+
 Use VSCode with the plugin MicroPico
+
 Use the commands while developing:
+
 - Delete all files from pico
 - Upload project files to pico
 - Run
 
-MCP 4725 lookup table:
+## MCP 4725 lookup table
 
 | note no | 12 bit value | voltage output | keyboard note (example only) |
 | ------- | ------------ | -------------- | ---------------------------- |
@@ -88,4 +96,3 @@ MCP 4725 lookup table:
 | 58      | 3944         | 4.814453125    | A#                           |
 | 59      | 4012         | 4.897460938    | B                            |
 | 60      | 4080         | 4.98046875     | C                            |
-
