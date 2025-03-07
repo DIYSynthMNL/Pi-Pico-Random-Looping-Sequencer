@@ -28,7 +28,7 @@ A1 = GP27
 A2 = GP28
 A3 = GP29
 
-TODO implement control voltage input to change variables
+TODO: implement control voltage input to change variables
 """
 
 import machine
@@ -201,7 +201,7 @@ def handle_clock_pulse() -> None:
                 # print(cv_sequence)
             # print("Step: ", current_step)
             # print(cv_sequence[current_step])
-            # TODO: trigger erase
+            # TODO: trigger erase, trigger length
             # output trigger
             digital_out.value(trigger_sequence[current_step])
             current_step += 1
