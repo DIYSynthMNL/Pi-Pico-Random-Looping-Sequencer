@@ -1,0 +1,19 @@
+##[pylyzer] failed c:\users\acer\desktop\synth diy\pi pico\projects\random looping sequencer\lib\mcp4725.py 1740804880 2152
+
+.___v_desugar_1: Never
+.I2C: Never
+.BUS_ADDRESS: Never
+.POWER_DOWN_MODE: Never
+.MCP4725: ClassType
+.MCP4725.i2c: Never
+.MCP4725.address: Never
+.MCP4725._writeBuffer: Never
+.MCP4725.__call__: (i2c: Obj, address: Obj := Obj and Obj) -> mcp4725.MCP4725
+.MCP4725.write: |O <: Structural({.__rshift__ = (self: Never, ?R) -> ?O; .__and__ = (self: Never, ?R) -> ?V; .__lt__ = (self: Never, ?R) -> Bool}), R: Type, O: Type, V: Type|(self: mcp4725.MCP4725, value: O) -> {.self.i2c.writeto(.self.address, .self._writeBuffer) in {2}}
+.MCP4725.read: (self: mcp4725.MCP4725) -> {None}
+.MCP4725.config: (self: mcp4725.MCP4725, power_down: Obj := Obj and Obj, value: Structural({.__rshift__ = (self: Never, Obj) -> Never; .__and__ = (self: Never, Obj) -> Structural({.__lshift__ = (self: Never, Obj) -> Never}); .__lt__ = (self: Never, Obj) -> Bool}) := {0} and Structural({.__rshift__ = (self: Never, Obj) -> Never; .__and__ = (self: Never, Obj) -> Structural({.__lshift__ = (self: Never, Obj) -> Never}); .__lt__ = (self: Never, Obj) -> Bool}), eeprom: Bool := {False} and Bool) -> {.self.i2c.writeto(.self.address, .buf) in {3}}
+.MCP4725._powerDownKey: (self: mcp4725.MCP4725, value: Obj) -> NoneType
+
+
+.MCP4725._powerDownKey: (self: mcp4725.MCP4725, value: Obj) -> NoneType
+

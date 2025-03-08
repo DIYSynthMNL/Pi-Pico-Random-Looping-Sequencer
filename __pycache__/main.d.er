@@ -1,0 +1,79 @@
+##[pylyzer] failed c:\users\acer\desktop\synth diy\pi pico\projects\random looping sequencer\main.py 1741427178 10669
+
+.machine: Never
+
+.mcp4725: Never
+
+.sc: Never
+
+.random: Never
+
+.m: Never
+
+.analog_reader: Never
+
+.___v_desugar_1: Never
+.AnalogueReader: Never
+.sda: {16}
+.scl: {17}
+.digital_input_pin: {21}
+.clock_input_pin: {22}
+.digital_output_pin: {23}
+.A0: {26}
+.A1: {27}
+.A2: {28}
+.A3: {29}
+.i2c_channel: {0}
+.i2c: Never
+.dac: Never
+.clock_in: Never
+.digital_in: Never
+.digital_out: Never
+.MAX_NUMBER_OF_STEPS: {16}
+.MIN_NUMBER_OF_STEPS: {2}
+.MAX_NUMBER_OF_OCTAVES: {5}
+.MIN_NUMBER_OF_OCTAVES: {1}
+.cv_sequence: List!(Never, 0)
+.trigger_sequence: List!(Never, 0)
+.tuning_cv_sequence: List!({816, 1632}, 16)
+.test_cv_sequence: List!(Never, 0)
+.current_step: {0}
+.number_of_steps: {16}
+.step_changed_on_clock_pulse: {False}
+.cv_probability_of_change: {0}
+.trigger_probability_of_change: {0}
+.is_cv_erase: {False}
+.is_test_cv_sequence: {False}
+.is_tuning_cv_sequence: {False}
+.scale_intervals: Never
+.current_scale_interval: {"major"}
+.starting_note: {12}
+.number_of_octaves: {1}
+.current_12bit_scale: Never
+.main_menu: Never
+.scale_menu: Never
+.cv_prob_menu: Never
+.steps_menu: Never
+.octaves_menu: Never
+.starting_note_menu: Never
+.cv_erase_toggle_menu: Never
+.test_cv_scale_toggle_menu: Never
+.is_tuning_cv_scale_menu: Never
+.submenus: List!(Never, 8)
+
+.cv1: Never
+.cv2: Never
+.cv3: Never
+.cv4: Never
+.handle_clock_pulse: () -> NoneType
+.randomly_change_current_step_cv: () -> NoneType
+.randomly_change_step_trigger: () -> NoneType
+.generate_boolean_with_probability: (probability: Float) -> Bool
+.populate_sequence_with_default: () -> NoneType
+.get_test_sequence: () -> List!(Int, _: Nat)
+.test_cv_sequence: List!(Int, _: Nat)
+
+
+
+.update_sequencer_values: () -> NoneType
+

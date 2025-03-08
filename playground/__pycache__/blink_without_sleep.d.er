@@ -1,0 +1,10 @@
+##[pylyzer] failed c:\users\acer\desktop\synth diy\pi pico\projects\random looping sequencer\playground\blink_without_sleep.py 1710915682 339
+.___v_desugar_1: Never
+.Pin: Never
+.time: Never
+
+.led: Never
+
+.previous_ticks: {0}
+.interval: {200}
+
