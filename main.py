@@ -29,6 +29,7 @@ A2 = GP28
 A3 = GP29
 
 TODO: implement control voltage input to change variables
+TODO: Schematic
 """
 
 import machine
@@ -87,7 +88,7 @@ tuning_cv_sequence = [
 ]
 test_cv_sequence = []
 current_step = 0
-number_of_steps = 16  # user can edit from 1 to any
+number_of_steps = MAX_NUMBER_OF_STEPS  # user can edit from 1 to any
 step_changed_on_clock_pulse = False
 cv_probability_of_change = 0  # user can edit 0 to 100
 trigger_probability_of_change = 0
@@ -219,6 +220,7 @@ def randomly_change_current_step_cv() -> None:
     if generate_boolean_with_probability(cv_probability_of_change):
         # print("change cv")
         cv_sequence[current_step] = current_12bit_scale[random_scale_index]
+
 
 def randomly_change_step_trigger() -> None:
     global trigger_sequence
