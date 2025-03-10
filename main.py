@@ -97,13 +97,13 @@ cv_probability_of_change = 0  # user can edit 0 to 100
 trigger_probability_of_change = 0
 trigger_length_percent = 50
 trigger_start_ticks = 0
-previous_trigger_ticks = 0
 previous_clock_ticks = 0
 trigger_active = False
 clock_ms = 0
 trig_length_ms = 0
 ticks_to_trigger_off = 0
 is_cv_erase = False
+is_trig_erase = False
 is_test_cv_sequence = False
 is_tuning_cv_sequence = False
 
@@ -177,6 +177,10 @@ cv_erase_toggle_menu = m.ToggleMenu(
     "CvErase", button=main_menu.button, value=is_cv_erase
 )
 
+trig_erase_toggle_menu = m.ToggleMenu(
+    "TrigErase", button=main_menu.button, value=is_trig_erase
+)
+
 test_cv_scale_toggle_menu = m.ToggleMenu(
     "TestScale", button=main_menu.button, value=is_test_cv_sequence
 )
@@ -189,13 +193,14 @@ submenus = [
     scale_menu,
     cv_prob_menu,
     trig_prob_menu,
+    trig_length_menu,
     steps_menu,
     octaves_menu,
     starting_note_menu,
     cv_erase_toggle_menu,
+    trig_erase_toggle_menu,
     test_cv_scale_toggle_menu,
     is_tuning_cv_scale_menu,
-    trig_length_menu,
 ]
 main_menu.set_submenus(submenu_list=submenus)
 
@@ -223,6 +228,9 @@ def handle_clock_pulse() -> None:
 
             if is_cv_erase:
                 cv_sequence[current_step] = current_12bit_scale[0]
+
+            if is_trig_erase:
+                trigger_sequence[current_step] = 1
 
             # Output the CV value
             if is_test_cv_sequence:
@@ -329,7 +337,7 @@ def update_sequencer_values() -> None:
         number of steps,
         number of octaves
     """
-    global current_12bit_scale, cv_probability_of_change, trigger_probability_of_change, number_of_steps, current_scale_interval, number_of_octaves, starting_note, is_test_cv_sequence, test_cv_sequence, is_cv_erase, is_tuning_cv_sequence, trigger_length_percent
+    global current_12bit_scale, cv_probability_of_change, trigger_probability_of_change, number_of_steps, current_scale_interval, number_of_octaves, starting_note, is_test_cv_sequence, test_cv_sequence, is_cv_erase, is_tuning_cv_sequence, trigger_length_percent, is_trig_erase
     print("update_sequencer_values")
     submenus = main_menu.get_submenu_list()
     for submenu in submenus:
@@ -347,6 +355,11 @@ def update_sequencer_values() -> None:
             if trigger_probability_of_change != submenu.selected:
                 trigger_probability_of_change = submenu.selected
                 print("Trig probability changed:", trigger_probability_of_change)
+
+        elif submenu.name is trig_length_menu.name:
+            if trigger_length_percent != submenu.selected:
+                trigger_length_percent = submenu.selected
+                print("Trig length changed:", trigger_length_percent)
 
         elif submenu.name is steps_menu.name:
             if number_of_steps != submenu.selected:
@@ -368,6 +381,11 @@ def update_sequencer_values() -> None:
                 is_cv_erase = submenu.value
                 print("ToggleMenu changed:", submenu.value)
 
+        elif submenu.name is trig_erase_toggle_menu.name:
+            if is_trig_erase != submenu.value:
+                is_trig_erase = submenu.value
+                print("ToggleMenu changed:", submenu.value)
+
         elif submenu.name is test_cv_scale_toggle_menu.name:
             if is_test_cv_sequence != submenu.value:
                 is_test_cv_sequence = submenu.value
@@ -377,11 +395,6 @@ def update_sequencer_values() -> None:
             if is_tuning_cv_sequence != submenu.value:
                 is_tuning_cv_sequence = submenu.value
                 print("ToggleMenu changed:", submenu.value)
-
-        elif submenu.name is trig_length_menu.name:
-            if trigger_length_percent != submenu.selected:
-                trigger_length_percent = submenu.selected
-                print("Trig length changed:", trigger_length_percent)
 
         else:
             pass
