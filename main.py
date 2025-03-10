@@ -96,9 +96,13 @@ step_changed_on_clock_pulse = False
 cv_probability_of_change = 0  # user can edit 0 to 100
 trigger_probability_of_change = 0
 trigger_length_percent = 50
+trigger_start_ticks = 0
 previous_trigger_ticks = 0
 previous_clock_ticks = 0
+trigger_active = False
 clock_ms = 0
+trig_length_ms = 0
+ticks_to_trigger_off = 0
 is_cv_erase = False
 is_test_cv_sequence = False
 is_tuning_cv_sequence = False
@@ -135,7 +139,7 @@ trig_prob_menu = m.NumericalValueRangeMenu(
     increment=5,
 )
 
-trig_length_ms_menu = m.NumericalValueRangeMenu(
+trig_length_menu = m.NumericalValueRangeMenu(
     "TrgLngth%",
     button=main_menu.button,
     selected=trigger_length_percent,
@@ -191,7 +195,7 @@ submenus = [
     cv_erase_toggle_menu,
     test_cv_scale_toggle_menu,
     is_tuning_cv_scale_menu,
-    trig_length_ms_menu,
+    trig_length_menu,
 ]
 main_menu.set_submenus(submenu_list=submenus)
 
@@ -203,17 +207,15 @@ cv4 = AnalogueReader(A0)
 
 
 def handle_clock_pulse() -> None:
-    global current_step, step_changed_on_clock_pulse, clock_in, number_of_steps, previous_clock_ticks, clock_ms, previous_trigger_ticks
+    global current_step, step_changed_on_clock_pulse, clock_in, number_of_steps, previous_clock_ticks, clock_ms, trigger_start_ticks, trigger_active, ticks_to_trigger_off
+
     current_clock_ticks = time.ticks_ms()
 
     if current_step < number_of_steps:
-        if clock_in.value() == 0 and step_changed_on_clock_pulse == False:
-            # actual clock value high
-
+        if clock_in.value() == 0 and not step_changed_on_clock_pulse:
+            # Clock rising edge detected
             previous_clock_ticks = current_clock_ticks
-
-            test_cv_sequence = get_test_sequence()  # update the test_cv_sequence
-
+            test_cv_sequence = get_test_sequence()  # Update CV sequence
             step_changed_on_clock_pulse = True
 
             randomly_change_current_step_cv()
@@ -222,35 +224,52 @@ def handle_clock_pulse() -> None:
             if is_cv_erase:
                 cv_sequence[current_step] = current_12bit_scale[0]
 
-            # check which cv sequence to output
+            # Output the CV value
             if is_test_cv_sequence:
-                # outputs a cv sequence that runs through the scale ascending
                 dac.write(test_cv_sequence[current_step])
             elif is_tuning_cv_sequence:
                 dac.write(tuning_cv_sequence[current_step])
             else:
-                # output cv
                 dac.write(cv_sequence[current_step])
 
-            if current_step == 0:
-                pass
-                # print(cv_sequence)
-            # print("Step: ", current_step)
-            # print(cv_sequence[current_step])
+            # Calculate trigger length
+            trig_length_ms = (clock_ms * trigger_length_percent) // 100
+            # print("Trigger length ms:", trig_length_ms)
 
-            # output_trigger()
-            trig_length_ms = (clock_ms * trigger_length_percent) / 100
-            print("Trigger length ms:", trig_length_ms)
+            # Trigger output logic
+            if trigger_sequence[current_step] == 1:
+                digital_out.value(0)  # Turn on trigger
+                trigger_start_ticks = time.ticks_ms()  # Store trigger start time
+
+                # print("Trigger on")
+                # print("Trigger start ticks", trigger_start_ticks)
+
+                # calculate trigger off ticks
+                ticks_to_trigger_off = time.ticks_add(
+                    trig_length_ms, trigger_start_ticks
+                )
+                trigger_active = True  # Mark trigger as active
 
             current_step += 1
-        if clock_in.value() == 1 and step_changed_on_clock_pulse == True:
-            # actual clock value low
+
+        if clock_in.value() == 1 and step_changed_on_clock_pulse:
+            # Clock falling edge detected
             step_changed_on_clock_pulse = False
-            # calculate length of clock pulse
             clock_ms = time.ticks_diff(current_clock_ticks, previous_clock_ticks)
-            print("Clock length ms:", clock_ms)
+            # print("Clock length ms:", clock_ms)
     else:
         current_step = 0
+
+
+def check_trigger_off():
+    """Turn off the trigger when the time is reached."""
+    global trigger_active, trigger_start_ticks, trig_length_ms, ticks_to_trigger_off
+    current_ticks = time.ticks_ms()
+    if trigger_active:
+        if current_ticks >= ticks_to_trigger_off:
+            # print("trigger off")
+            digital_out.value(1)  # Turn off trigger
+            trigger_active = False  # Reset trigger state
 
 
 def randomly_change_current_step_cv() -> None:
@@ -267,26 +286,6 @@ def randomly_change_step_trigger() -> None:
     trig_on_or_off = random.randint(0, 1)
     if generate_boolean_with_probability(trigger_probability_of_change):
         trigger_sequence[current_step] = trig_on_or_off
-
-
-def output_trigger() -> None:
-    global previous_trigger_ticks, clock_ms
-
-    trig_length_ms = (clock_ms * trigger_length_percent) / 100
-    print("Trigger length ms:", trig_length_ms)
-
-    print("Trigger sequence:", trigger_sequence)
-
-    current_ticks = time.ticks_ms()
-    print("Output trigger:", not trigger_sequence[current_step])
-    digital_out.value(not trigger_sequence[current_step])
-
-    if time.ticks_diff(current_ticks, previous_trigger_ticks) >= trig_length_ms:
-        print("Ticks diff:", time.ticks_diff(current_ticks, previous_trigger_ticks))
-        previous_trigger_ticks = current_ticks
-        if trigger_sequence[current_step] == 1:
-            print("Turn off trigger")
-            digital_out.value(1)
 
 
 def generate_boolean_with_probability(probability: float) -> bool:
@@ -379,7 +378,7 @@ def update_sequencer_values() -> None:
                 is_tuning_cv_sequence = submenu.value
                 print("ToggleMenu changed:", submenu.value)
 
-        elif submenu.name is trig_length_ms_menu.name:
+        elif submenu.name is trig_length_menu.name:
             if trigger_length_percent != submenu.selected:
                 trigger_length_percent = submenu.selected
                 print("Trig length changed:", trigger_length_percent)
@@ -419,3 +418,4 @@ while True:
         update_main_program_values_callback=update_sequencer_values
     )
     handle_clock_pulse()
+    check_trigger_off()
