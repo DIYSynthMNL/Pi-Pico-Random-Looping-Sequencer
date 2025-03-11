@@ -4,6 +4,8 @@ For use with the MCP4725 DAC
 
 Scale algorithm from https://github.com/hmillerbakewell/musical-scales/tree/main
 read more here: https://musical-scales.readthedocs.io/en/latest/musical_scales.html
+
+Credits go to Hector Miller-Bakewell. (https://github.com/hmillerbakewell/musical-scales/blob/main/license)
 """
 
 # To get a 12 bit value from a note number, it must be multiplied by 68
