@@ -1,6 +1,10 @@
 """
 Coded by DIYSynthMNL
 
+MIT License (MIT)
+Copyright (c) 2023 Neo Recasata
+https://opensource.org/licenses/MIT
+
 Made to aid in making a menu system for the Pi Pico with an Oled Screen and a rotary encoder
 
 Currently tested and working for 128px * 64px OLED displays
