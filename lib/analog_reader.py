@@ -1,10 +1,12 @@
 """
-Analog reader from the Euro Pi
+Python script from the EuroPi
+This program is lisenced under the Apache License Version 2.0. (https://github.com/Allen-Synthesis/EuroPi/blob/main/software/LICENSE)
 All credits go to Rory Allen 2024
 https://github.com/Allen-Synthesis/EuroPi/blob/main/software/firmware/europi.py
 
 Changes:
 - Added invert to AnalogueReader
+- Added map_value()
 
 """
 
