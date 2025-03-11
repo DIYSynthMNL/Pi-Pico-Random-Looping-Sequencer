@@ -1,5 +1,6 @@
 """
 https://github.com/wayoda/micropython-mcp4725/blob/master/mcp4725.py
+This program is licensed under The Unlicense. (https://github.com/wayoda/micropython-mcp4725/blob/master/LICENSE)
 All credits go to wayoda
 
 """
