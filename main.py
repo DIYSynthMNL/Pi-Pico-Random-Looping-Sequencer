@@ -1,4 +1,8 @@
 """
+MIT License (MIT)
+Copyright (c) 2025 Neo Recasata
+https://opensource.org/licenses/MIT
+
 Pi Pico Quantized Random Looping Sequencer (with 128x64 px OLED screen)
 By DIYSynthMNL
 
