@@ -1,4 +1,8 @@
-"""Retrieve a scale based on a given mode and starting note."""
+"""
+Retrieve a scale based on a given mode and starting note.
+This program is licensed under the MIT license.
+All credits go to Hector Miller-Bakewell. https://github.com/hmillerbakewell/musical-scales/blob/main/license
+"""
 
 import math
 
