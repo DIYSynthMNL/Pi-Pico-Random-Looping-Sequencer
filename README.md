@@ -2,6 +2,8 @@
 
 Read the design notes here: [https://diysynthmnl.github.io/p/electric-druid-vcdo/](https://diysynthmnl.github.io/p/electric-druid-vcdo/)
 
+[Demo on YouTube](https://youtu.be/u1J9JrJe1Y0)
+
 ## Features
 
 - 128x64 oled screen
