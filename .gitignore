@@ -1,0 +1,22 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+.venv/
+
+# KiCad
+*-backups
+*.bak
+*.bck
+*.kicad_pcb-bak
+*.kicad_sch-bak
+*.kicad_prl
+_autosave-*
+*-save.pro
+*-save.kicad_pcb
+*.kicad_pcb.zip
+fp-info-cache
+
+# OS junk
+.DS_Store
+Thumbs.db
