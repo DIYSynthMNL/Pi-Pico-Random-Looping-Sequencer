@@ -38,18 +38,26 @@ Use the commands while developing:
 
 ## Build status
 
-What's available for builders, and what's still on the TODO list:
+What's ready for builders today, and what's still on the TODO list:
 
-- [x] Schematic PDF (latest Rev 0.1.0) — [pi-pico-random-looping-sequencer-schematic-rev-0.1.0.pdf](Hardware/Schematics/pi-pico-random-looping-sequencer-schematic-rev-0.1.0.pdf)
-- [ ] KiCad source files — *not yet*
-- [ ] Gerber files for PCB fabrication — *not yet exported — generate from kicad/ before sending to a fab*
-- [ ] Bill of materials (BOM) — *not yet exported*
-- [x] 3D-printed front panel STL — [pico-rand-loop-V2.stl](Hardware/3D%20printed%20panel/pico-rand-loop-V2.stl)
-- [ ] Front panel graphics (SVG/PDF for fab-made panels) — *not yet exported*
-- [ ] Photos of the assembled module — *not yet — coming soon*
-- [x] Demo video — [watch](https://youtu.be/u1J9JrJe1Y0)
-- [ ] Build / assembly instructions — *not yet written*
-- [ ] Calibration / tuning notes — *not yet written*
+**Production assets** (what you need to actually fabricate and assemble a final unit)
+
+- [x] Schematic — Rev 0.1.0 ([pi-pico-random-looping-sequencer-schematic-rev-0.1.0.pdf](Hardware/Schematics/pi-pico-random-looping-sequencer-schematic-rev-0.1.0.pdf))
+- [ ] PCB layout — in progress — single working layout in `Hardware/pi-pico-random-looping-sequencer/`, not yet separated for fab
+- [ ] Gerber files for fabrication — none yet
+- [ ] BOM — none yet
+- [ ] Final front panel (SVG/PDF for fab) — none yet
 - [x] License — [LICENSE](LICENSE)
 
-If you want to help fill a gap (build photos, gerbers, an assembly guide), open an issue or PR.
+**Prototype assets** (for breadboard / perfboard / 3D-printed-panel builds before final PCB)
+
+- [x] 3D-printed prototype panel STL — [pico-rand-loop-V2.stl](Hardware/3D%20printed%20panel/pico-rand-loop-V2.stl)
+
+**Documentation**
+
+- [ ] Photos of the assembled module — none yet
+- [x] Demo video — [watch](https://youtu.be/u1J9JrJe1Y0)
+- [ ] Build / assembly instructions — none yet
+- [ ] Calibration / tuning notes — none yet
+
+Want to help fill a gap (build photos, gerbers, an assembly guide)? Open an issue or PR.
