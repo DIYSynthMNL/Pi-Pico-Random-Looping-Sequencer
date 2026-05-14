@@ -35,3 +35,21 @@ Use the commands while developing:
 - Delete all files from pico
 - Upload project files to pico
 - Run
+
+## Build status
+
+What's available for builders, and what's still on the TODO list:
+
+- [x] Schematic PDF (latest Rev 0.1.0) — [pi-pico-random-looping-sequencer-schematic-rev-0.1.0.pdf](Hardware/Schematics/pi-pico-random-looping-sequencer-schematic-rev-0.1.0.pdf)
+- [ ] KiCad source files — *not yet*
+- [ ] Gerber files for PCB fabrication — *not yet exported — generate from kicad/ before sending to a fab*
+- [ ] Bill of materials (BOM) — *not yet exported*
+- [x] 3D-printed front panel STL — [pico-rand-loop-V2.stl](Hardware/3D%20printed%20panel/pico-rand-loop-V2.stl)
+- [ ] Front panel graphics (SVG/PDF for fab-made panels) — *not yet exported*
+- [ ] Photos of the assembled module — *not yet — coming soon*
+- [x] Demo video — [watch](https://youtu.be/u1J9JrJe1Y0)
+- [ ] Build / assembly instructions — *not yet written*
+- [ ] Calibration / tuning notes — *not yet written*
+- [x] License — [LICENSE](LICENSE)
+
+If you want to help fill a gap (build photos, gerbers, an assembly guide), open an issue or PR.
