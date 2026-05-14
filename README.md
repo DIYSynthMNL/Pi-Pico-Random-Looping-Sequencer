@@ -1,6 +1,6 @@
 # A random generator Eurorack module
 
-Read the design notes here: [https://diysynthmnl.github.io/p/electric-druid-vcdo/](https://diysynthmnl.github.io/p/electric-druid-vcdo/)
+Build notes and write-ups on the blog: [diysynthmnl.github.io](https://diysynthmnl.github.io/)
 
 [Demo on YouTube](https://youtu.be/u1J9JrJe1Y0)
 
