@@ -1,5 +1,7 @@
 # A random generator Eurorack module
 
+![Pi Pico Random Looping Sequencer powered on](photos/front.jpg)
+
 Build notes and write-ups on the blog: [diysynthmnl.github.io](https://diysynthmnl.github.io/)
 
 [Demo on YouTube](https://youtu.be/u1J9JrJe1Y0)
@@ -55,7 +57,7 @@ What's ready for builders today, and what's still on the TODO list:
 
 **Documentation**
 
-- [ ] Photos of the assembled module — none yet (drop in [`photos/`](photos/))
+- [x] Photos of the assembled module — see [photos/](photos/)
 - [x] Demo video — [watch](https://youtu.be/u1J9JrJe1Y0)
 - [ ] Build / assembly instructions — none yet
 - [ ] Calibration / tuning notes — none yet
