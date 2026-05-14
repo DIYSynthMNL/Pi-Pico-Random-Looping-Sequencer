@@ -55,7 +55,7 @@ What's ready for builders today, and what's still on the TODO list:
 
 **Documentation**
 
-- [ ] Photos of the assembled module — none yet
+- [ ] Photos of the assembled module — none yet (drop in [`photos/`](photos/))
 - [x] Demo video — [watch](https://youtu.be/u1J9JrJe1Y0)
 - [ ] Build / assembly instructions — none yet
 - [ ] Calibration / tuning notes — none yet
