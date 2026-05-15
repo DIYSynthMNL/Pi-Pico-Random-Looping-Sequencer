@@ -186,6 +186,10 @@ If you're using a clone with GP29 exposed, patch a CV into Analog In 1 (which ma
 
 The Pico runs **MicroPython** firmware (not C/C++ SDK). MicroPython is slower but dramatically easier to iterate on — and the timing precision required for a step sequencer (a few ms of clock-edge accuracy) is well within MicroPython's capabilities on the RP2040.
 
+### C++ rewrite (in progress)
+
+A C++ rewrite of the firmware — host-agnostic `SequencerEngine` class plus a macOS playground simulator, with a Pico-SDK host planned — lives in its own repo: [**DIYSynthMNL/Pi-Pico-Random-Looping-Sequencer-Firmware**](https://github.com/DIYSynthMNL/Pi-Pico-Random-Looping-Sequencer-Firmware). The MicroPython firmware in `Software/` is still the running firmware on hardware today.
+
 ## Borrowed firmware libraries
 
 Two external libraries are vendored into `Software/lib/`:
